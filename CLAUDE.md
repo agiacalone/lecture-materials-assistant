@@ -35,35 +35,41 @@ lecture-designer/
    - `lib/palette.js` — shared color constants
    - `lib/docx-helpers.js` — shared docx construction helpers (re-exports `docx` constructors)
    - `lib/pptx-helpers.js` — `createSlideHelpers(pptx, total, course, topic)` factory
-   - `generators/lecture-notes.js`, `generators/cornell-handout.js`, `generators/study-questions.js`, `generators/quiz.js`, `generators/slides.js`, `generators/readme.js` — one per artifact, each independently runnable
-   - `generate.js` — CLI orchestrator: `node generate.js [--all|--notes|--cornell|--questions|--quiz|--slides|--readme]`
-4. User runs `node generate.js` (all) or `node generate.js --slides` (one artifact) or `node generators/slides.js` (standalone)
+   - `lib/bank-helpers.js` — question-bank parsing, dedupe, and numbering helpers
+   - `lib/exam-helpers.js` — exam assembly, weighting, shuffle, and compile helpers
+   - `generators/lecture-notes.js`, `generators/cornell-handout.js`, `generators/study-questions.js`, `generators/quiz.js`, `generators/slides.js`, `generators/readme.js`, `generators/question-bank.js`, `generators/exam.js` — one per artifact family, each independently runnable
+   - `generate.js` — CLI orchestrator for the standard lecture set: `node generate.js [--all|--notes|--cornell|--questions|--quiz|--slides|--readme]`
+4. User runs:
+   - `node generate.js` for the standard six-artifact lecture set
+   - `node generate.js --slides` for one lecture artifact
+   - `node generators/question-bank.js` for a topic-wide bank
+   - `node generators/exam.js` for exam assembly and PDF compilation
 
-For exam generation, Claude reads `references/reference_exam.tex` as a structural
-reference and assembles a `.tex` file directly (no Node.js script needed).
-Compile with `pdflatex [filename].tex`.
+For exam generation, Claude still reads `references/reference_exam.tex` as a structural
+reference, but exam output is produced through `generators/exam.js`, which writes the
+`.tex` file and invokes `pdflatex`.
 
 ## Output Artifacts
 
 | File | Format | Key constraints |
 |------|--------|-----------------|
-| `[topic]_notes.docx` | Lecture notes | Arial, navy/blue headers, 8 callout types |
-| `[topic]_cornell.docx` | Student handout | 2-col layout, ~40% blank density, blank audit required |
-| `[topic]_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze |
+| `[topic]_lecture_notes.docx` | Lecture notes | Arial, navy/blue headers, 8 callout types |
+| `[topic]_cornell_handout.docx` | Student handout | 2-col layout, ~40% blank density, blank audit required |
+| `[topic]_study_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze |
 | `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
 | `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
-| `[course]-exam-[n]-[term].pdf` | Exam | Assembled from bank(s), compiled to PDF via pdflatex; `.tex` source retained alongside; answer key: set `\answerstrue` + recompile |
-| `[topic]_readme.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
+| `[course_num]-exam-[n]-[term].pdf` | Exam | Assembled from bank(s), compiled to PDF via pdflatex; `.tex` source retained alongside; generator toggles `\answerstrue` and recompiles for the key |
+| `README.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
 | `[topic]_slides.pptx` | Slide deck | 14–18 slides, CS Modern dark slate theme, mandatory indigo stripe + badge |
 
 ## Required npm/pip Dependencies (user installs once)
 
 ```bash
-npm install -g docx pptxgenjs react react-dom react-icons sharp
-pip install "markitdown[docx,pptx]" --break-system-packages
+npm install docx pptxgenjs markdown-it
 ```
 
-Scripts use `docx` v9+ and `pptxgenjs` v4+. Icons are rasterized from `react-icons` via `sharp` at ≥256px.
+Scripts use `docx` v9+ and `pptxgenjs` v4+. Exams also require a LaTeX toolchain
+with `pdflatex` available on `PATH`.
 
 ## QA for Slides
 
@@ -89,5 +95,5 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 - **Study questions**: Open-ended and case-study reference questions are always required. Attacker-mindset question required only when `adversarial-thinking: yes` (Security courses). Defaults to `no`.
 - **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.
 - **Question bank**: Persistent, append-only Markdown file — never overwrite, only add. Types: `mc` (4-option), `tf` (T/F), `code` (code-interpretation T/F), `fib` (quiz/handout only, never exams), `sa` (short answer). Type + difficulty (★/★★/★★★) are the two scoring dimensions used by exam assembly. Read the file before adding to avoid duplicates and assign the next sequence number per type.
-- **Exam**: Generate `.tex` from bank `.md` files, then run `pdflatex` automatically — PDF is the final deliverable, `.tex` is retained as editable source. MC section mixes `mc`+`tf`+`code` — no separate T/F section. `fib` never in exams. Answer key: set `\answerstrue` + recompile. Parallel sections: `randomize: yes` + section suffix (e.g. `-A`, `-B`). File naming: `[course_num]-exam-[n]-[term]`.
+- **Exam**: Generate `.tex` from bank `.md` files, then run `pdflatex` automatically — PDF is the final deliverable, `.tex` is retained as editable source. MC section mixes `mc`+`tf`+`code` — no separate T/F section. `fib` never in exams. The generator produces both student and key PDFs by toggling `\answerstrue` and recompiling. Parallel sections: `randomize: yes` + section suffix (e.g. `-A`, `-B`). File naming: `[course_num]-exam-[n]-[term]`.
 - **GitHub README**: Two variants — reading assignment (answer questions from a chapter) and lab/programming assignment (build something, verifiable requirements). Choose based on `assessment format` in course context. Deliverables and "Please note" boilerplate must be copied exactly in both variants.

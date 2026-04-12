@@ -651,7 +651,10 @@ Dark panel `1E293B` with shadow; left accent bar in section color for emphasis r
 
 ### Icons
 
-`react-icons`, rasterized to PNG via `sharp` at 256px minimum.
+Use simple, high-contrast icons only when they clarify the slide. Prefer native
+PptxGenJS shapes or bundled image assets over introducing extra icon-processing
+dependencies. If raster icons are used, render them at 256px minimum before
+placing them on slides.
 
 ### No accent lines under titles — use whitespace or background color.
 
