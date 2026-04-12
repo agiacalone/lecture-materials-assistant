@@ -228,13 +228,16 @@ MC answers include why the distractors are wrong.
 
 ## Question Bank (.md)
 
-A Markdown file that serves as the source of truth for exam and quiz authoring.
-Scoped to a **full lecture topic** (2–4 sessions). The bank is consumed by the exam
-assembly step to generate `.lyx` exams; it also feeds the pop quiz.
+A **persistent, append-only** Markdown file — the source of truth for exam and quiz
+authoring. One file per topic; questions accumulate as the topic is taught over
+semesters. Never regenerate or overwrite an existing bank — only append new questions.
 
-- **Format:** Markdown — human-editable, readable in any viewer
-- **Total questions:** ~50 across four types
-- **Input required:** full topic name + list of subtopics/sessions covered
+The bank is queryable by **type** and **difficulty**, which are the two scoring
+dimensions the exam assembly step uses to select questions. A typical exam spec says
+"give me N questions of difficulty ★ from type mc/tf/code" — the bank is the pool
+that selection draws from.
+
+- **Format:** Markdown — human-editable, diffable, readable in any viewer
 - **File naming:** `[topic]_question_bank.md`
 
 ### File Header
@@ -249,17 +252,16 @@ sessions: [Subtopic 1], [Subtopic 2], [Subtopic 3] …
 
 ### Question Types
 
-| Type tag | Description | Count |
+| Type tag | Description | Exam use |
 |---|---|---|
-| `mc` | Standard 4-option multiple choice | 15 |
-| `tf` | True / False (renders as 2-option MC in exam) | 12 |
-| `code` | Code interpretation T/F (show snippet, ask if correct) | 5 |
-| `fib` | Fill-in-the-blank (for quizzes and handouts) | 10 |
-| `sa` | Short answer / short essay | 8 |
+| `mc` | Standard 4-option multiple choice | MC section |
+| `tf` | True / False statement | MC section (mixed with `mc`) |
+| `code` | Code interpretation T/F — show snippet, ask if correct | MC section (mixed with `mc`) |
+| `fib` | Fill-in-the-blank | Quizzes and handouts only |
+| `sa` | Short answer / short essay | Essay section |
 
-**Note:** `tf` and `code` are both True/False variants. In an assembled exam they
-appear mixed into the MC section alongside `mc` questions — there is no separate
-T/F section. `fib` questions are used in pop quizzes and handouts, not exams.
+`tf` and `code` render as 2-option questions in the exam MC section — there is no
+separate T/F section. `fib` questions never appear in exams.
 
 ### Question Format
 
@@ -298,12 +300,14 @@ Target mix across each type: ~40% `★`, ~35% `★★`, ~25% `★★★`.
 
 ### Design Rules
 
+- **Never overwrite an existing bank** — read the file first, then append new questions at the end
+- Assign the next available sequence number within each type (e.g. if `mc-12` exists, next is `mc-13`)
 - All questions answerable from lecture content or assigned readings — no outside knowledge
 - `mc` distractors must be plausible — no throwaway wrong answers
 - `tf` statements: avoid absolute qualifiers ("always", "never") unless that is the point
-- `code` questions: the incorrect implementations must have a subtle, realistic bug
+- `code` questions: incorrect implementations must have a subtle, realistic bug
 - Every subtopic must appear in at least two question types
-- Do not reuse questions verbatim from the study questions or pop quiz documents
+- Do not duplicate questions already in the bank — read existing entries before adding
 
 ---
 
