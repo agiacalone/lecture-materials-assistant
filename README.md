@@ -214,6 +214,11 @@ node generators/exam.js
 - `references/style-guide.md` — complete style specifications for all artifacts
 - `references/reference_exam.tex` — structural LaTeX template for exam generation
 
+Generated code, generated course materials, and other outputs created by using this
+repository are owned by the user who generates them. Those outputs are not required
+to be licensed under this repository's license unless they copy substantial portions
+of this repository itself.
+
 ## License
 
-[GPL-3.0](LICENSE)
+[MIT](LICENSE)
