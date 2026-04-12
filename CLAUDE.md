@@ -40,6 +40,7 @@ lecture-designer/
 | `[topic]_notes.docx` | Lecture notes | Arial, navy/blue headers, 8 callout types |
 | `[topic]_cornell.docx` | Student handout | 2-col layout, ~40% blank density, blank audit required |
 | `[topic]_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze |
+| `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
 | `[topic]_readme.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
 | `[topic]_slides.pptx` | Slide deck | 14–18 slides, threat-intel dark theme, mandatory red stripe + badge |
 
@@ -65,4 +66,5 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 - **Cornell blanks**: Every blank must have a declared source (slide number, lecture notes section, or "verbal"). Never leave silent gaps. Run a blank audit before finalizing.
 - **Slides**: Theme colors are navy `#0D1B2A`, red `#C0392B`, gold `#F39C12`. Every content slide needs a red stripe and section badge.
 - **Study questions**: Attacker mindset, open-ended, and case-study reference are mandatory across the 10 questions.
+- **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.
 - **GitHub README**: The Deliverables and "Please note" boilerplate must be copied exactly — do not paraphrase.

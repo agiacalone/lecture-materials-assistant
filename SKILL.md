@@ -2,13 +2,14 @@
 name: lecture-materials-assistant
 description: >
   Generates complete lecture material sets for CS professors: lecture notes (.docx),
-  Cornell note-taking handouts (.docx), study questions (.docx), GitHub Classroom
-  README assignments (.md), and slide decks (.pptx). Use this skill whenever a user
-  asks to generate, create, or update any lecture materials, course handouts, slides,
-  or GitHub Classroom assignments — even partial requests like "make me a Cornell
-  handout for X" or "add questions to the README". Enforces strict style consistency,
-  Cornell ↔ slide alignment auditing, and tiered difficulty question design. Always
-  use this skill for any CS lecture content generation task.
+  Cornell note-taking handouts (.docx), study questions (.docx), pop quizzes (.docx),
+  GitHub Classroom README assignments (.md), and slide decks (.pptx). Use this skill
+  whenever a user asks to generate, create, or update any lecture materials, course
+  handouts, slides, quizzes, or GitHub Classroom assignments — even partial requests
+  like "make me a Cornell handout for X", "add questions to the README", or "write a
+  pop quiz on Y". Enforces strict style consistency, Cornell ↔ slide alignment
+  auditing, and tiered difficulty question design. Always use this skill for any CS
+  lecture content generation task.
 ---
 
 # Lecture Materials Assistant
@@ -63,7 +64,8 @@ If any field is missing from the request, ask for it before proceeding.
 |---|---|---|
 | Lecture notes | `[topic]_lecture_notes.docx` | Full instructor copy with speaker notes, timing, callouts |
 | Cornell handout | `[topic]_cornell_handout.docx` | 2-page student sheet with strategic blanks |
-| Study questions | `[topic]_study_questions.docx` | 10 tiered questions |
+| Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
+| Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
 | GitHub README | `README.md` | GitHub Classroom assignment |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, dark threat-intel theme |
 
@@ -112,6 +114,7 @@ Lowercase with underscores. Course code does **not** appear in filenames.
 cryptography_lecture_notes.docx
 cryptography_cornell_handout.docx
 cryptography_study_questions.docx
+cryptography_quiz.docx
 cryptography_slides.pptx
 README.md
 ```
@@ -126,6 +129,7 @@ any artifact. It covers:
 - Lecture notes: fonts, colors, callout box types, speaker note format, section order
 - Cornell handout: column layout, blank types, blank density, alignment audit rules
 - Study questions: difficulty tiers, question design principles, format per question
+- Pop quiz: question types, count, answer key format, timing
 - GitHub README: exact structure, boilerplate text (copy verbatim), Markdown rules
 - Slide deck: color palette, typography, slide structure, card/panel patterns
 

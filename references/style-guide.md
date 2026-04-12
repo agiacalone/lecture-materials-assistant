@@ -134,6 +134,64 @@ either add it to a slide or flag it *(verbal)*.
 
 ---
 
+## Pop Quiz (.docx)
+
+- **Count:** 5 questions
+- **Time:** ~10 minutes
+- **Font / page:** Arial, US Letter, 1" margins — matches lecture notes
+
+### Header Block (top of page)
+
+```
+POP QUIZ — [Topic in ALL CAPS]
+[Course Code] — [Course Name]
+Name: ______________________________    Date: ___________
+```
+
+Course code line in navy `1F3864`, bold. Name/Date line in body text.
+
+### Question Types and Distribution
+
+| # | Type | Tier |
+|---|---|---|
+| Q1–Q2 | Multiple choice (4 options A–D) | Recall |
+| Q3 | Fill-in-the-blank (1–2 blanks) | Recall / Apply |
+| Q4 | Short answer (2–3 sentences expected) | Apply |
+| Q5 | Short answer (3–5 sentences expected) | Analyze |
+
+- MC options each on their own line, indented, labeled `A.` `B.` `C.` `D.`
+- Short-answer questions followed by ruled answer lines sized to expected response
+- All questions drawn from slide content or stated lecture material — no curveballs
+
+### Format Per Question
+
+- Bold `Q#.` prefix in navy `1F3864`
+- Question text in normal weight
+- No difficulty badge (unlike study questions — keep the quiz feel clean)
+- Ruled lines below short-answer questions: 3 lines for Apply, 5 lines for Analyze
+
+### Answer Key
+
+Page break after Q5. Separate page with red header:
+
+```
+ANSWER KEY — NOT FOR DISTRIBUTION
+[Course Code] — [Topic]
+```
+
+Header background red `C0392B`, white text. Each answer listed `Q1: [answer]` in bold,
+followed by a brief explanation (1–2 sentences) that could serve as a grading rubric.
+MC answers include why the distractors are wrong.
+
+### Design Rules
+
+- Every question must have an unambiguous correct answer (or clear rubric for short answer)
+- MC distractors must be plausible — no throwaway wrong answers
+- Do not reuse questions verbatim from the study questions document
+- Quiz should be completable in 10 minutes by a prepared student
+
+---
+
 ## GitHub Assignment (README.md)
 
 ### Structure
