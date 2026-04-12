@@ -66,16 +66,22 @@ If any field is missing from the request, ask for it before proceeding.
 | Cornell handout | `[topic]_cornell_handout.docx` | 2-page student sheet with strategic blanks |
 | Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
-| Question bank | `[topic]_question_bank.docx` | ~30 questions across 4 types for exam/quiz authoring |
+| Question bank | `[topic]_question_bank.docx` | ~50 questions across 4 types, scoped to full topic (2–4 sessions) |
 | GitHub README | `README.md` | GitHub Classroom assignment |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, dark threat-intel theme |
 
-**Default (generate everything):**
+**Default (generate everything — single session):**
 > "Generate lecture materials for [TOPIC] in [COURSE]. Cover: [KEY CONCEPTS]. Case studies: [EXAMPLES]. ~[N] minutes."
 
 **Subset:** "Generate lecture notes and slides only for [TOPIC]."
 
 **Update existing:** "Reusing [TOPIC] lecture — add section on [NEW CONCEPT]. Add 2 README questions covering it."
+
+**Question bank (topic-wide, multi-session):**
+> "Generate a question bank for [TOPIC] in [COURSE]. Sessions covered: [SUBTOPIC 1], [SUBTOPIC 2], [SUBTOPIC 3]. Total material: ~[N] hours."
+
+The question bank requires the full topic scope — all subtopics and sessions — before
+generating. If subtopics are not provided, ask for them before proceeding.
 
 ---
 

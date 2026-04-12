@@ -194,21 +194,24 @@ MC answers include why the distractors are wrong.
 
 ## Question Bank (.docx)
 
-A reusable pool of questions for exam and quiz authoring. Organized by question type,
-not by difficulty — the instructor selects and assembles their own assessments from it.
+A reusable pool of questions for exam and quiz authoring. Scoped to a **full lecture
+topic**, which may span 2–4 class sessions (2–4 hours of content). Organized by
+question type — the instructor selects and assembles their own assessments from it.
 
 - **Font / page:** Arial, US Letter, 1" margins — matches lecture notes
-- **Total questions:** ~30 across four sections
+- **Total questions:** ~50 across four sections
+- **Input required:** full topic name + list of subtopics/sessions covered
 
 ### Header Block
 
 ```
 QUESTION BANK — [Topic in ALL CAPS]
 [Course Code] — [Course Name]
+Sessions covered: [Subtopic 1] | [Subtopic 2] | [Subtopic 3] …
 ```
 
-Course code line in navy `1F3864`, bold. Subtitle in body text:
-`For instructor use only. Select questions to assemble quizzes and exams.`
+Course code line in navy `1F3864`, bold. Sessions line in muted gray `888888`, italic.
+Subtitle in body text: `For instructor use only. Select questions to assemble quizzes and exams.`
 
 ### Sections and Question Counts
 
@@ -217,10 +220,26 @@ Questions are numbered continuously within each section (MC-1, MC-2 … TF-1, TF
 
 | Section | Header label | Count |
 |---|---|---|
-| Multiple Choice | `MULTIPLE CHOICE` | 10 |
-| True / False | `TRUE / FALSE` | 8 |
-| Fill-in-the-Blank | `FILL IN THE BLANK` | 6 |
-| Short Answer | `SHORT ANSWER` | 6 |
+| Multiple Choice | `MULTIPLE CHOICE` | 20 |
+| True / False | `TRUE / FALSE` | 12 |
+| Fill-in-the-Blank | `FILL IN THE BLANK` | 10 |
+| Short Answer | `SHORT ANSWER` | 8 |
+
+### Subtopic Grouping
+
+Within each section, questions are grouped by subtopic. Each subtopic opens with a
+shaded divider row (light blue `EBF3FB`, navy bold text) spanning the column:
+
+```
+  ── Authentication Fundamentals ──
+MC-1  …
+MC-2  …
+  ── Password Attacks ──
+MC-3  …
+```
+
+Distribute questions proportionally across subtopics — no subtopic should have fewer
+than 2 or more than 40% of a section's questions.
 
 ### Difficulty Tag
 
@@ -231,6 +250,7 @@ Every question carries an inline difficulty tag in muted gray `888888` after the
 - `[★★★]` — Analyze
 
 Distribute difficulty across each section; do not cluster all hard questions at the end.
+Target mix per section: ~40% Recall, ~35% Apply, ~25% Analyze.
 
 ### Format by Type
 
@@ -242,7 +262,7 @@ Distribute difficulty across each section; do not cluster all hard questions at 
 
 **True / False**
 - Statement only — no hints in the phrasing
-- Balance: roughly half true, half false across the 8 questions
+- Balance: roughly half true, half false across the section
 - Avoid absolute qualifiers ("always", "never") unless they are the point being tested
 
 **Fill-in-the-Blank**
@@ -252,8 +272,8 @@ Distribute difficulty across each section; do not cluster all hard questions at 
 
 **Short Answer**
 - One focused question; 3–5 sentence response expected
-- Include a parenthetical word-count or scope hint: *(2–3 sentences)*
-- Mix factual, applied, and analytical prompts
+- Include a parenthetical scope hint: *(2–3 sentences)*
+- Mix factual, applied, and analytical prompts; at least 2 must require synthesis across subtopics
 
 ### Answer Key
 
@@ -274,7 +294,7 @@ question prefix labels (MC-1, MC-2 …).
 
 - All questions must be answerable from lecture content or assigned readings — no outside knowledge
 - Do not reuse questions verbatim from the study questions or pop quiz documents
-- Each section should cover a spread of lecture topics, not concentrate on one subtopic
+- Coverage must be proportional — every subtopic must appear in at least two question types
 - Short answer questions must not duplicate each other in what they assess
 
 ---
