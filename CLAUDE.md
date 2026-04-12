@@ -20,18 +20,22 @@ When deployed as a skill, the entry point is `SKILL.md`. When invoked, Claude mu
 
 ```
 lecture-designer/
-├── SKILL.md                  # Skill metadata, workflow, artifact specs, file naming
-├── CLAUDE.md.example         # Template users copy to their course project directory
+├── SKILL.md                       # Skill metadata, workflow, artifact specs, file naming
+├── CLAUDE.md.example              # Template users copy to their course project directory
 ├── references/
-│   └── style-guide.md        # Complete style specs — MUST read before generating
-└── assets/                   # Placeholder for course-specific assets
+│   ├── style-guide.md             # Complete style specs — MUST read before generating
+│   └── reference_exam.lyx        # Structural reference for LyX exam generation
+└── assets/                        # Placeholder for course-specific assets
 ```
 
 **Generation flow:**
-1. User specifies topic + 4 course context fields (course code, student level, lecture length, assessment format)
+1. User specifies topic + 5 course context fields (course code, student level, lecture length, assessment format, adversarial-thinking)
 2. Claude reads `SKILL.md` + `style-guide.md`
 3. Claude writes a Node.js script (`[topic]_generate.js`) in the user's working directory
-4. User runs `node [topic]_generate.js` → produces 5 output files
+4. User runs `node [topic]_generate.js` → produces `.docx`/`.pptx`/`.md` artifacts
+
+For exam generation, Claude reads `references/reference_exam.lyx` as a structural
+reference and assembles a `.lyx` file directly (no Node.js script needed).
 
 ## Output Artifacts
 
