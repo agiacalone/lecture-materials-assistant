@@ -11,10 +11,15 @@ slide-*.jpg
 
 # Generated question banks and exams (course-specific, not part of skill)
 *_question_bank.md
-*-exam-*.lyx
+*-exam-*.tex
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.pdf
 
 # But keep the reference exam template
-!references/reference_exam.lyx
+!references/reference_exam.tex
 
 # macOS
 .DS_Store

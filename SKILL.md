@@ -69,7 +69,7 @@ If any field is missing from the request, ask for it before proceeding.
 | Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
 | Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |
-| Exam | `[course]-exam-[n]-[term].lyx` | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section |
+| Exam | `[course]-exam-[n]-[term].tex` | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section; answer key via `\ifanswers` toggle |
 | GitHub README | `README.md` | GitHub Classroom assignment (reading or lab/programming variant) |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, CS Modern dark slate theme |
 
@@ -91,7 +91,7 @@ generating. If subtopics are not provided, ask for them before proceeding.
 
 For two parallel sections needing different question sets, run assembly twice with
 `randomize: yes` — same bank, different shuffle. Provide the section identifier so
-file names are distinct (e.g. `326-exam-1-sp26-A.lyx`, `326-exam-1-sp26-B.lyx`).
+file names are distinct (e.g. `326-exam-1-sp26-A.tex`, `326-exam-1-sp26-B.tex`).
 
 ---
 
@@ -137,7 +137,7 @@ cryptography_slides.pptx
 README.md
 
 # Exam (assembled from one or more banks):
-326-exam-1-sp26.lyx
+326-exam-1-sp26.tex
 ```
 
 ---

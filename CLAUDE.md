@@ -24,7 +24,7 @@ lecture-designer/
 ├── CLAUDE.md.example              # Template users copy to their course project directory
 ├── references/
 │   ├── style-guide.md             # Complete style specs — MUST read before generating
-│   └── reference_exam.lyx        # Structural reference for LyX exam generation
+│   └── reference_exam.tex         # Structural reference for LaTeX exam generation
 └── assets/                        # Placeholder for course-specific assets
 ```
 
@@ -34,8 +34,9 @@ lecture-designer/
 3. Claude writes a Node.js script (`[topic]_generate.js`) in the user's working directory
 4. User runs `node [topic]_generate.js` → produces `.docx`/`.pptx`/`.md` artifacts
 
-For exam generation, Claude reads `references/reference_exam.lyx` as a structural
-reference and assembles a `.lyx` file directly (no Node.js script needed).
+For exam generation, Claude reads `references/reference_exam.tex` as a structural
+reference and assembles a `.tex` file directly (no Node.js script needed).
+Compile with `pdflatex [filename].tex`.
 
 ## Output Artifacts
 
@@ -46,7 +47,7 @@ reference and assembles a `.lyx` file directly (no Node.js script needed).
 | `[topic]_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze |
 | `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
 | `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
-| `[course]-exam-[n]-[term].lyx` | Exam | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section; answer key as inline LyX notes |
+| `[course]-exam-[n]-[term].tex` | Exam | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section; answer key via `\ifanswers` toggle |
 | `[topic]_readme.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
 | `[topic]_slides.pptx` | Slide deck | 14–18 slides, CS Modern dark slate theme, mandatory indigo stripe + badge |
 
@@ -69,7 +70,7 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 
 ## Code and Diagrams (all artifacts)
 
-- **Inline code**: Menlo, gray background `F5F5F5`. **Code blocks**: same in .docx; dark panel `1E293B` with limited syntax highlighting in slides; fenced blocks in .md; `\begin_inset listings` in .lyx.
+- **Inline code**: Menlo, gray background `F5F5F5`. **Code blocks**: same in .docx; dark panel `1E293B` with limited syntax highlighting in slides; fenced blocks in .md; `\begin{lstlisting}` in .tex.
 - **Pseudocode**: use when language-independent; label as `pseudocode`; prefer over real code in handouts and study questions unless the course requires reading real source.
 - **Code blanks in handout**: replace target token/line with `_______`, keep surrounding structure intact, one blank per logical unit.
 - **Diagrams in .docx**: approximate with structured tables and bordered boxes — the `docx` package cannot render vector graphics. Every diagram gets a bold **Figure:** caption.
@@ -83,5 +84,5 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 - **Study questions**: Open-ended and case-study reference questions are always required. Attacker-mindset question required only when `adversarial-thinking: yes` (Security courses). Defaults to `no`.
 - **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.
 - **Question bank**: Persistent, append-only Markdown file — never overwrite, only add. Types: `mc` (4-option), `tf` (T/F), `code` (code-interpretation T/F), `fib` (quiz/handout only, never exams), `sa` (short answer). Type + difficulty (★/★★/★★★) are the two scoring dimensions used by exam assembly. Read the file before adding to avoid duplicates and assign the next sequence number per type.
-- **Exam**: LyX output assembled from bank `.md` files. MC section mixes `mc`+`tf`+`code` — no separate T/F section. `fib` questions never appear in exams. Answer key embedded as LyX notes (same file, toggled visible). For parallel sections use `randomize: yes` and a section suffix in the filename (e.g. `-A.lyx`, `-B.lyx`). File naming: `[course_num]-exam-[n]-[term].lyx`.
+- **Exam**: Plain LaTeX `.tex` assembled from bank `.md` files. MC section mixes `mc`+`tf`+`code` — no separate T/F section. `fib` never in exams. Answer key via `\answerstrue` at top of file — same source, recompile for key. Parallel sections: `randomize: yes` + section suffix (e.g. `-A.tex`, `-B.tex`). File naming: `[course_num]-exam-[n]-[term].tex`. Compile: `pdflatex`.
 - **GitHub README**: Two variants — reading assignment (answer questions from a chapter) and lab/programming assignment (build something, verifiable requirements). Choose based on `assessment format` in course context. Deliverables and "Please note" boilerplate must be copied exactly in both variants.

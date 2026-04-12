@@ -411,10 +411,11 @@ Target mix across each type: ~40% `★`, ~35% `★★`, ~25% `★★★`.
 
 ---
 
-## Exam (.lyx)
+## Exam (.tex)
 
-Assembled from one or more question bank `.md` files. Output is a `.lyx` file
-matching the instructor's established exam style.
+Assembled from one or more question bank `.md` files. Output is a plain LaTeX
+`.tex` file compiled with `pdflatex`. See `references/reference_exam.tex` for
+the full structural reference.
 
 ### Exam Assembly Input
 
@@ -456,19 +457,24 @@ Direction line: *In the space provided below, answer the following questions
 completely, but as briefly as possible. Partial credit will be given for
 incomplete answers.*
 
-Questions drawn from `sa` type. Continuous numbering continuing from MC.
-Each question followed by 14–16 `\begin_inset VSpace bigskip` lines for handwritten answers.
+Questions drawn from `sa` type. Continuous numbering continuing from MC via
+`\begin{enumerate}[resume]`. Each question followed by 14 `\bigskip` lines for
+handwritten answers (omitted when `\answerstrue`).
 
-### LyX Formatting Rules
+### LaTeX Formatting Rules
 
-- Answer key embedded as `\begin_inset Note Note` inline after each question stem —
-  same file serves as both exam and key; toggling note visibility exports either version
-- Page breaks (`\begin_inset Newpage pagebreak`) after roughly every 10 MC questions
-  and between sections
-- Code blocks rendered via `\begin_inset listings` with Menlo typewriter font
-- Name/ID rules: `\begin_inset CommandInset line` with `width "35page%"` (name)
-  and `width "20page%"` (ID)
-- File naming: `[course_num]-exam-[n]-[term].lyx` (e.g. `326-exam-1-sp26.lyx`)
+- **Packages:** `geometry` (letterpaper, 1in margins), `enumitem`, `listings`
+- **Answer key toggle:** `\newif\ifanswers` at top of file — `\answersfalse` for
+  student copy, `\answerstrue` for key. Answers and model responses wrapped in
+  `\ifanswers ... \fi` inline after each question stem.
+- **Compile:** `pdflatex [filename].tex`
+- **MC answer options:** `\begin{enumerate}[label=\alph*.]` nested inside each `\item`
+- **Essay continuation:** `\begin{enumerate}[resume]` to continue numbering from MC
+- **Code blocks:** `\begin{lstlisting}` with `basicstyle=\ttfamily\small`, single frame
+- **Name/ID rules:** `\rule{0.35\linewidth}{0.4pt}` (name) and `\rule{0.20\linewidth}{0.4pt}` (ID)
+- **Page breaks:** `\newpage` after roughly every 10 MC questions and between sections
+- **Section headers:** `\paragraph*{...}` (bold run-in heading, matches existing style)
+- **File naming:** `[course_num]-exam-[n]-[term].tex` (e.g. `326-exam-1-sp26.tex`)
 
 ### Design Rules
 
