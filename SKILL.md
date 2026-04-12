@@ -86,8 +86,12 @@ If any field is missing from the request, ask for it before proceeding.
 The question bank requires the full topic scope — all subtopics and sessions — before
 generating. If subtopics are not provided, ask for them before proceeding.
 
-**Exam (assembled from one or more banks):**
-> "Assemble an exam for [COURSE] [TERM], [EXAM NAME], [N] pts. Draw from: [bank1.md], [bank2.md]. MC: [N] questions × [pts] pts. Essay: [N] questions × [pts] pts. Difficulty: ★ [N]%, ★★ [N]%, ★★★ [N]%. Randomize: yes/no."
+**Exam (assembled from 2–3 topic banks):**
+> "Assemble an exam for [COURSE] [TERM], [EXAM NAME], [N] pts. Draw from: [bank1.md], [bank2.md], [bank3.md]. MC: [N] questions × [pts] pts. Essay: [N] questions × [pts] pts. Difficulty: ★ [N]%, ★★ [N]%, ★★★ [N]%. Randomize: yes/no."
+
+Exams typically span 2–3 lecture topics. If topics had unequal session counts,
+weight question selection proportionally (e.g. a 3-session topic gets more
+questions than a 2-session topic in the same exam).
 
 For two parallel sections needing different question sets, run assembly twice with
 `randomize: yes` — same bank, different shuffle. Provide the section identifier so

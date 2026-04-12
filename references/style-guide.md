@@ -417,6 +417,12 @@ Assembled from one or more question bank `.md` files. The `.tex` source is
 generated first, then compiled to PDF. The PDF is the final deliverable.
 See `references/reference_exam.tex` for the full structural reference.
 
+### Scope
+
+A typical exam covers **2–3 lecture topics** (each topic spanning 2–4 sessions).
+Draw from one question bank per topic; weight question counts proportionally to
+the number of sessions each topic covers if they are unequal.
+
 ### Exam Assembly Input
 
 Provide when requesting an exam:
