@@ -49,12 +49,14 @@ them — never re-ask.
 
 | Field | Example |
 |---|---|
-| **Course code + name** | CECS 378 — Introduction to Computer Security |
-| **Student level** | Upper-division CS majors; strong programming background |
+| **Course code + name** | CECS 326 — Operating Systems |
+| **Student level** | Upper-division CS majors; strong C/systems programming background |
 | **Lecture length** | ~75 minutes |
 | **Assessment format** | GitHub Classroom (Markdown), in-class activities |
+| **Adversarial thinking** | yes (Security) / no (OS, Distributed Systems) |
 
 If any field is missing from the request, ask for it before proceeding.
+`adversarial-thinking` defaults to **no** if not specified.
 
 ---
 
@@ -68,7 +70,7 @@ If any field is missing from the request, ask for it before proceeding.
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
 | Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |
 | Exam | `[course]-exam-[n]-[term].lyx` | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section |
-| GitHub README | `README.md` | GitHub Classroom assignment |
+| GitHub README | `README.md` | GitHub Classroom assignment (reading or lab/programming variant) |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, CS Modern dark slate theme |
 
 **Default (generate everything — single session):**
@@ -176,7 +178,7 @@ any artifact. It covers:
 | `[Analyze]` | purple `6A1B9A` | 5 | Synthesize, evaluate, argue |
 
 Required design rules:
-- At least 1 question requires attacker-mindset / adversarial thinking
+- If `adversarial-thinking: yes` — at least 1 question requires attacker-mindset / adversarial thinking
 - At least 1 has no single correct answer (graded on reasoning quality)
 - At least 1 references a specific case study from lecture
 - Multi-part questions use lettered sub-items (a, b, c)

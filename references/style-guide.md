@@ -254,7 +254,7 @@ to scaffolded text.
 
 ### Required Design Rules
 
-- At least 1 question requires attacker-mindset or adversarial thinking
+- If `adversarial-thinking: yes` — at least 1 question requires attacker-mindset or adversarial thinking
 - At least 1 has no single correct answer (graded on reasoning quality)
 - At least 1 references a specific case study from lecture
 - Multi-part questions use lettered sub-items (a, b, c)
@@ -479,7 +479,17 @@ Each question followed by 14–16 `\begin_inset VSpace bigskip` lines for handwr
 
 ## GitHub Assignment (README.md)
 
-### Structure
+Two variants. Choose based on `assessment format` in the course context:
+- **Reading assignment** — answer questions from a chapter or paper
+- **Lab / programming assignment** — build something and document it
+
+Both share the same Deliverables and "Please note" boilerplate (copy verbatim).
+
+---
+
+### Variant A: Reading Assignment
+
+#### Structure
 
 ```markdown
 # [COURSE] Reading Assignment: [Topic]
@@ -508,7 +518,7 @@ Answer the following questions from the [Chapter X] reading...
 [standard boilerplate — copy verbatim]
 ```
 
-### Rules
+#### Rules
 
 - Numbered questions only (no bullets at top level)
 - Sub-questions: nested `1.` / `2.` / `3.` indented 4 spaces
@@ -516,6 +526,54 @@ Answer the following questions from the [Chapter X] reading...
 - Figures: `![Alt text](filename.png "Title")`
 - Blockquotes (`>`) for notes, warnings, contextual callouts
 - Deliverables and "Please note" sections are **verbatim boilerplate — never change**
+
+---
+
+### Variant B: Lab / Programming Assignment
+
+#### Structure
+
+```markdown
+# [COURSE] Lab Assignment: [Lab Name]
+
+### Overview
+[1–2 sentences describing what the student will build or investigate]
+
+### Background
+[Optional: 1–3 paragraphs or bullet points of relevant context, pseudocode,
+or system description the student needs to complete the lab]
+
+### Requirements
+
+1. [Specific, verifiable deliverable]
+2. [Specific, verifiable deliverable]
+3. [Deliverable with sub-tasks:]
+   1. Sub-task
+   2. Sub-task
+
+### Questions
+[Optional: numbered questions the student answers as part of their writeup]
+
+1. Question text
+
+### Deliverables
+[standard boilerplate — copy verbatim]
+
+#### Please note:
+[standard boilerplate — copy verbatim]
+```
+
+#### Rules
+
+- Requirements are numbered, specific, and verifiable — not vague ("implement X" not "learn about X")
+- Background section is optional but should be included whenever the lab involves
+  an algorithm, protocol, or system not fully covered in recent lecture
+- Questions section is optional; use it when you want written analysis alongside code
+- Blockquotes (`>`) for warnings, hints, or constraints (e.g., `> You must use POSIX threads`)
+- Code blocks: triple backticks with language hint; use for starter code, expected output, or examples
+- Deliverables and "Please note" sections are **verbatim boilerplate — never change**
+
+---
 
 ### Standard Deliverables Boilerplate (copy exactly)
 

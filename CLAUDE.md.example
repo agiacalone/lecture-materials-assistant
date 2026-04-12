@@ -7,8 +7,18 @@
 
 ## Course Context
 
-<!-- Optional: pre-populate so you don't have to re-specify each session -->
-<!-- Course code + name: CECS 378 — Introduction to Computer Security        -->
-<!-- Student level:      Upper-division CS majors, strong programming background, minimal security background -->
-<!-- Lecture length:     ~75 minutes                                          -->
-<!-- Assessment format:  GitHub Classroom (Markdown), in-class activities     -->
+<!-- Fill in once; Claude will remember for the session and never re-ask. -->
+
+<!-- Course code + name:    CECS 326 — Operating Systems                          -->
+<!-- Student level:         Upper-division CS majors; strong C/systems background  -->
+<!-- Lecture length:        ~75 minutes                                            -->
+<!-- Assessment format:     GitHub Classroom (Markdown), in-class activities       -->
+<!-- Adversarial thinking:  no                                                     -->
+
+<!--
+  adversarial-thinking controls whether study questions and question bank
+  require at least one attacker-mindset / adversarial question.
+
+  yes  →  Security courses (CECS 378, 478)
+  no   →  OS, Distributed Systems, and other courses (default)
+-->
