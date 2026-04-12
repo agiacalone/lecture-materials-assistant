@@ -41,7 +41,8 @@ lecture-designer/
 | `[topic]_cornell.docx` | Student handout | 2-col layout, ~40% blank density, blank audit required |
 | `[topic]_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze |
 | `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
-| `[topic]_question_bank.docx` | Question bank | ~50 questions: 20 MC, 12 T/F, 10 fill-in-the-blank, 8 short answer; scoped to full topic (2–4 sessions); subtopic grouping within each section |
+| `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
+| `[course]-exam-[n]-[term].lyx` | Exam | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section; answer key as inline LyX notes |
 | `[topic]_readme.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
 | `[topic]_slides.pptx` | Slide deck | 14–18 slides, CS Modern dark slate theme, mandatory indigo stripe + badge |
 
@@ -68,5 +69,6 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 - **Slides**: Theme colors are slate `#0F172A`, indigo `#6366F1`, amber `#F59E0B`. Every content slide needs an indigo stripe and section badge.
 - **Study questions**: Attacker mindset, open-ended, and case-study reference are mandatory across the 10 questions.
 - **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.
-- **Question bank**: Topic-wide scope (2–4 sessions) — requires full subtopic list before generating; ask if not provided. Questions numbered by type prefix (MC-1, TF-1, etc.) and grouped by subtopic within each section. Every question carries a `[★]`/`[★★]`/`[★★★]` difficulty tag (~40% Recall, ~35% Apply, ~25% Analyze). Every subtopic must appear in at least two question types. Do not reuse questions verbatim from study questions or pop quiz.
+- **Question bank**: Markdown, topic-wide (2–4 sessions). Requires subtopic list before generating. Types: `mc` (4-option), `tf` (T/F), `code` (code-interpretation T/F), `fib` (fill-in-the-blank, quiz/handout use only), `sa` (short answer). Every question tagged with type, difficulty (★/★★/★★★), and subtopic. ~40/35/25% difficulty split. Every subtopic in at least two types.
+- **Exam**: LyX output assembled from bank `.md` files. MC section mixes `mc`+`tf`+`code` — no separate T/F section. `fib` questions never appear in exams. Answer key embedded as LyX notes (same file, toggled visible). For parallel sections use `randomize: yes` and a section suffix in the filename (e.g. `-A.lyx`, `-B.lyx`). File naming: `[course_num]-exam-[n]-[term].lyx`.
 - **GitHub README**: The Deliverables and "Please note" boilerplate must be copied exactly — do not paraphrase.

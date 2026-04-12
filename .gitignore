@@ -3,10 +3,15 @@
 *_notes.docx
 *_cornell.docx
 *_questions.docx
+*_quiz.docx
 *_slides.pptx
 *_readme.md
 slide-*.jpg
 *.pdf
+
+# Generated question banks and exams (course-specific, not part of skill)
+*_question_bank.md
+*-exam-*.lyx
 
 # macOS
 .DS_Store

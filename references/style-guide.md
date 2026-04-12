@@ -226,110 +226,153 @@ MC answers include why the distractors are wrong.
 
 ---
 
-## Question Bank (.docx)
+## Question Bank (.md)
 
-A reusable pool of questions for exam and quiz authoring. Scoped to a **full lecture
-topic**, which may span 2–4 class sessions (2–4 hours of content). Organized by
-question type — the instructor selects and assembles their own assessments from it.
+A Markdown file that serves as the source of truth for exam and quiz authoring.
+Scoped to a **full lecture topic** (2–4 sessions). The bank is consumed by the exam
+assembly step to generate `.lyx` exams; it also feeds the pop quiz.
 
-- **Font / page:** Arial, US Letter, 1" margins — matches lecture notes
-- **Total questions:** ~50 across four sections
+- **Format:** Markdown — human-editable, readable in any viewer
+- **Total questions:** ~50 across four types
 - **Input required:** full topic name + list of subtopics/sessions covered
+- **File naming:** `[topic]_question_bank.md`
 
-### Header Block
+### File Header
 
+```markdown
+---
+topic: [Topic Name]
+course: [Course Code]
+sessions: [Subtopic 1], [Subtopic 2], [Subtopic 3] …
+---
 ```
-QUESTION BANK — [Topic in ALL CAPS]
-[Course Code] — [Course Name]
-Sessions covered: [Subtopic 1] | [Subtopic 2] | [Subtopic 3] …
-```
 
-Course code line in navy `1F3864`, bold. Sessions line in muted gray `888888`, italic.
-Subtitle in body text: `For instructor use only. Select questions to assemble quizzes and exams.`
+### Question Types
 
-### Sections and Question Counts
-
-Each section opens with a full-width dark navy `1F3864` header row (white text, bold).
-Questions are numbered continuously within each section (MC-1, MC-2 … TF-1, TF-2 …).
-
-| Section | Header label | Count |
+| Type tag | Description | Count |
 |---|---|---|
-| Multiple Choice | `MULTIPLE CHOICE` | 20 |
-| True / False | `TRUE / FALSE` | 12 |
-| Fill-in-the-Blank | `FILL IN THE BLANK` | 10 |
-| Short Answer | `SHORT ANSWER` | 8 |
+| `mc` | Standard 4-option multiple choice | 15 |
+| `tf` | True / False (renders as 2-option MC in exam) | 12 |
+| `code` | Code interpretation T/F (show snippet, ask if correct) | 5 |
+| `fib` | Fill-in-the-blank (for quizzes and handouts) | 10 |
+| `sa` | Short answer / short essay | 8 |
 
-### Subtopic Grouping
+**Note:** `tf` and `code` are both True/False variants. In an assembled exam they
+appear mixed into the MC section alongside `mc` questions — there is no separate
+T/F section. `fib` questions are used in pop quizzes and handouts, not exams.
 
-Within each section, questions are grouped by subtopic. Each subtopic opens with a
-shaded divider row (light blue `EBF3FB`, navy bold text) spanning the column:
+### Question Format
 
-```
-  ── Authentication Fundamentals ──
-MC-1  …
-MC-2  …
-  ── Password Attacks ──
-MC-3  …
-```
+Each question is a level-3 heading followed by structured fields:
 
-Distribute questions proportionally across subtopics — no subtopic should have fewer
-than 2 or more than 40% of a section's questions.
+```markdown
+### [TYPE]-[N] · [★/★★/★★★] · [Subtopic]
 
-### Difficulty Tag
+[Question stem or statement]
 
-Every question carries an inline difficulty tag in muted gray `888888` after the question number:
-
-- `[★]` — Recall
-- `[★★]` — Apply
-- `[★★★]` — Analyze
-
-Distribute difficulty across each section; do not cluster all hard questions at the end.
-Target mix per section: ~40% Recall, ~35% Apply, ~25% Analyze.
-
-### Format by Type
-
-**Multiple Choice**
-- Stem on its own line
-- Options on separate lines: `A.` `B.` `C.` `D.`
-- Distractors must be plausible — no throwaway wrong answers
-- One unambiguous correct answer per question
-
-**True / False**
-- Statement only — no hints in the phrasing
-- Balance: roughly half true, half false across the section
-- Avoid absolute qualifiers ("always", "never") unless they are the point being tested
-
-**Fill-in-the-Blank**
-- 1–2 blanks per sentence, represented as `_______`
-- Blanks target key terms, values, or process steps from lecture
-- Sentence must be unambiguous with the blank removed
-
-**Short Answer**
-- One focused question; 3–5 sentence response expected
-- Include a parenthetical scope hint: *(2–3 sentences)*
-- Mix factual, applied, and analytical prompts; at least 2 must require synthesis across subtopics
-
-### Answer Key
-
-Page break after the last Short Answer question. Separate page with red header:
-
-```
-ANSWER KEY — NOT FOR DISTRIBUTION
-[Course Code] — [Topic]
+```c
+// code block here for `code` type questions
 ```
 
-Header background red `C0392B`, white text. Answers grouped by section, matching the
-question prefix labels (MC-1, MC-2 …).
+A. [option]
+B. [option]
+C. [option]
+D. [option]
 
-- **MC / T/F / Fill-in:** Answer only, plus a one-sentence explanation
-- **Short Answer:** A model response (3–5 sentences) usable as a grading rubric
+**Answer:** [letter or True/False]
+**Explanation:** [one or two sentences; for SA, a model response + grading note]
+```
+
+- `mc`: 4 options (A–D)
+- `tf` and `code`: 2 options only — `A. True` / `B. False`
+- `fib`: no options — blank represented as `_______`
+- `sa`: no options — include model answer and grading rubric note
+
+### Difficulty Tags
+
+- `★` — Recall: direct from lecture, factual
+- `★★` — Apply: use concepts in a new context or scenario
+- `★★★` — Analyze: synthesize, evaluate, or trace through logic
+
+Target mix across each type: ~40% `★`, ~35% `★★`, ~25% `★★★`.
 
 ### Design Rules
 
-- All questions must be answerable from lecture content or assigned readings — no outside knowledge
+- All questions answerable from lecture content or assigned readings — no outside knowledge
+- `mc` distractors must be plausible — no throwaway wrong answers
+- `tf` statements: avoid absolute qualifiers ("always", "never") unless that is the point
+- `code` questions: the incorrect implementations must have a subtle, realistic bug
+- Every subtopic must appear in at least two question types
 - Do not reuse questions verbatim from the study questions or pop quiz documents
-- Coverage must be proportional — every subtopic must appear in at least two question types
-- Short answer questions must not duplicate each other in what they assess
+
+---
+
+## Exam (.lyx)
+
+Assembled from one or more question bank `.md` files. Output is a `.lyx` file
+matching the instructor's established exam style.
+
+### Exam Assembly Input
+
+Provide when requesting an exam:
+
+| Field | Example |
+|---|---|
+| Course + term | `CECS 326 — Spring 2026` |
+| Exam name + point total | `Exam One (50 pts)` |
+| Bank files to draw from | `processes_question_bank.md`, `threads_question_bank.md` |
+| MC section count + pts each | `20 questions × 2 pts` |
+| Essay section count + pts each | `2 questions × 5 pts` |
+| Difficulty distribution | `★: 40%, ★★: 35%, ★★★: 25%` |
+| Randomize | yes / no |
+
+If `randomize: yes`, shuffle questions within each difficulty tier before selecting.
+Two exam variants for parallel sections draw from the same bank with different shuffles.
+
+### Exam Structure (matching established format)
+
+**Header block:**
+```
+Name: _________________________________    Student ID#: ___________________
+[Course Code] – [Term]: [Exam Name] ([N] pts)
+Directions. [note-card policy + no-electronics rule]
+```
+
+**Section 1 — Multiple Choice ([pts] pts each)**
+
+Direction line: *Circle the best answer for each question. **Do not** write the
+answer in the space–it will be marked incorrect.*
+
+Questions drawn from `mc`, `tf`, and `code` types — mixed together, not separated.
+Continuous numbering starting at 1.
+
+**Section 2 — Short Essay and Code Interpretation ([pts] pts each)**
+
+Direction line: *In the space provided below, answer the following questions
+completely, but as briefly as possible. Partial credit will be given for
+incomplete answers.*
+
+Questions drawn from `sa` type. Continuous numbering continuing from MC.
+Each question followed by 14–16 `\begin_inset VSpace bigskip` lines for handwritten answers.
+
+### LyX Formatting Rules
+
+- Answer key embedded as `\begin_inset Note Note` inline after each question stem —
+  same file serves as both exam and key; toggling note visibility exports either version
+- Page breaks (`\begin_inset Newpage pagebreak`) after roughly every 10 MC questions
+  and between sections
+- Code blocks rendered via `\begin_inset listings` with Menlo typewriter font
+- Name/ID rules: `\begin_inset CommandInset line` with `width "35page%"` (name)
+  and `width "20page%"` (ID)
+- File naming: `[course_num]-exam-[n]-[term].lyx` (e.g. `326-exam-1-sp26.lyx`)
+
+### Design Rules
+
+- Point totals must add up exactly to the declared exam total
+- MC section question count and essay count must match the input spec
+- Difficulty distribution applied across the MC section as a whole, not per type
+- `code` questions must not appear back-to-back — interleave with `mc` and `tf`
+- No `fib` questions in exams
 
 ---
 

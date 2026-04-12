@@ -66,7 +66,8 @@ If any field is missing from the request, ask for it before proceeding.
 | Cornell handout | `[topic]_cornell_handout.docx` | 2-page student sheet with strategic blanks |
 | Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
-| Question bank | `[topic]_question_bank.docx` | ~50 questions across 4 types, scoped to full topic (2–4 sessions) |
+| Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |
+| Exam | `[course]-exam-[n]-[term].lyx` | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section |
 | GitHub README | `README.md` | GitHub Classroom assignment |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, CS Modern dark slate theme |
 
@@ -82,6 +83,13 @@ If any field is missing from the request, ask for it before proceeding.
 
 The question bank requires the full topic scope — all subtopics and sessions — before
 generating. If subtopics are not provided, ask for them before proceeding.
+
+**Exam (assembled from one or more banks):**
+> "Assemble an exam for [COURSE] [TERM], [EXAM NAME], [N] pts. Draw from: [bank1.md], [bank2.md]. MC: [N] questions × [pts] pts. Essay: [N] questions × [pts] pts. Difficulty: ★ [N]%, ★★ [N]%, ★★★ [N]%. Randomize: yes/no."
+
+For two parallel sections needing different question sets, run assembly twice with
+`randomize: yes` — same bank, different shuffle. Provide the section identifier so
+file names are distinct (e.g. `326-exam-1-sp26-A.lyx`, `326-exam-1-sp26-B.lyx`).
 
 ---
 
@@ -122,9 +130,12 @@ cryptography_lecture_notes.docx
 cryptography_cornell_handout.docx
 cryptography_study_questions.docx
 cryptography_quiz.docx
-cryptography_question_bank.docx
+cryptography_question_bank.md
 cryptography_slides.pptx
 README.md
+
+# Exam (assembled from one or more banks):
+326-exam-1-sp26.lyx
 ```
 
 ---
@@ -138,7 +149,8 @@ any artifact. It covers:
 - Cornell handout: column layout, blank types, blank density, alignment audit rules
 - Study questions: difficulty tiers, question design principles, format per question
 - Pop quiz: question types, count, answer key format, timing
-- Question bank: section layout, question counts per type, answer key format, difficulty tagging
+- Question bank: Markdown schema, question types (mc/tf/code/fib/sa), difficulty tagging, subtopic grouping
+- Exam: assembly input spec, LyX formatting rules, section structure, randomization
 - GitHub README: exact structure, boilerplate text (copy verbatim), Markdown rules
 - Slide deck: color palette, typography, slide structure, card/panel patterns
 
