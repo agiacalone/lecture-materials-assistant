@@ -50,16 +50,20 @@ Dark navy header `1F3864` white text; alternating white / `F0F4FA` rows.
 
 ## Cornell Handout (.docx)
 
-**Design premise:** Students do not receive a copy of the lecture slides. The handout
-is their only visual reference during and after class. It must function as both a
-note-taking tool in the moment and a complete study document afterward.
+**Design premise:** The handout is distributed before class via Canvas. Students bring
+it to lecture and fill in blanks from the projected slides. The professor adds verbal
+explanation beyond the slides — this is not blanked out, but assessed separately through
+short answer questions.
 
-This means:
-- Key frameworks, taxonomies, and diagrams from slides must be represented in the handout
-  (as partial diagrams, labeled outlines, or structured scaffolding — not left slide-only)
-- Scaffolded content must be sufficient for a student to reconstruct the lecture without slides
-- Every blank answer must reach the student through verbal delivery — there is no
-  "they can check the slide" fallback
+This creates a deliberate two-layer system:
+- **Blanks** → answered from projected slides; confirm attendance; shareable notes are an accepted outcome
+- **Short answer assessments** → test comprehension of verbal explanation; cannot be answered from blanks alone
+
+Students do not receive a personal copy of the slides. The completed handout
+(blanks filled from slides + scaffolded context) serves as their study document.
+Key frameworks and diagrams from slides must be represented in the handout as
+partial structures so students can orient themselves during lecture and have a
+complete reference afterward.
 
 ### Layout
 
@@ -112,19 +116,26 @@ Key terms with blank definitions.
 
 ## Blank Audit (MANDATORY)
 
-Every blank must have a declared source. Students have no slides to fall back on —
-every answer must reach them through verbal delivery or handout scaffolding.
+Every blank must be answerable from a projected slide during class. This is the
+attendance mechanism — students fill blanks by watching the lecture, not by guessing.
 
 | Blank type | Required source |
 |---|---|
-| Specific fact (%, name, value) | Professor must state verbally — mark cue column *(verbal)* |
-| Definition or concept | Stated verbally OR included as scaffolded context in the handout |
-| Process / chain step | Stated verbally OR represented in a partial diagram in the handout |
-| Synthesis / open-ended | No fixed source — mark cue column *(synthesis)* |
+| Specific fact (%, name, value) | Must appear on a slide — cite slide number in audit |
+| Definition or concept | Must appear on a slide |
+| Process / chain step | Must appear on a slide (process diagram, chain card, or table row) |
+| Synthesis / open-ended | No slide source needed — mark cue column *(synthesis)* |
 
-**Never leave silent gaps.** If neither the handout scaffolding nor verbal delivery
-supplies the answer, either add context to the handout or flag it *(verbal)* so the
-professor knows to say it explicitly.
+**Verbal explanation is not a blank source.** If the professor elaborates verbally
+beyond a slide, that content belongs in the scaffolded text of the handout, not as
+a blank — and it should be assessed through short answer questions, not fill-in.
+
+Mark the cue column *(verbal)* only as a professor reminder to say something
+explicitly. The corresponding notes-column cell must be scaffolded, not blank.
+
+**Never leave silent gaps.** Every blank must map to a readable answer on a specific
+projected slide. If no slide covers it, either add it to a slide or convert the blank
+to scaffolded text.
 
 ---
 
