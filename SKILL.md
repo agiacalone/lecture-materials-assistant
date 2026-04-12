@@ -95,7 +95,13 @@ questions than a 2-session topic in the same exam).
 
 For two parallel sections needing different question sets, run assembly twice with
 `randomize: yes` — same bank, different shuffle. Provide the section identifier so
-file names are distinct (e.g. `326-exam-1-sp26-A.tex`, `326-exam-1-sp26-B.tex`).
+file names are distinct (e.g. `326-exam-1-sp26-a.tex`, `326-exam-1-sp26-b.tex`).
+
+**Exam file naming convention:**
+- `[course_num]-exam-[n]-[term]` — e.g. `326-exam-1-sp26`
+- Term format: `sp` / `fa` / `su` + 2-digit year (e.g. `sp26`, `fa25`)
+- Parallel sections: append `-a`, `-b`, etc.
+- Answer key PDF: append `-key` (e.g. `326-exam-1-sp26-key.pdf`)
 
 ---
 

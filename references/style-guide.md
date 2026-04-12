@@ -480,7 +480,13 @@ handwritten answers (omitted when `\answerstrue`).
 - **Name/ID rules:** `\rule{0.35\linewidth}{0.4pt}` (name) and `\rule{0.20\linewidth}{0.4pt}` (ID)
 - **Page breaks:** `\newpage` after roughly every 10 MC questions and between sections
 - **Section headers:** `\paragraph*{...}` (bold run-in heading, matches existing style)
-- **File naming:** `[course_num]-exam-[n]-[term].tex` (e.g. `326-exam-1-sp26.tex`)
+- **File naming:** `[course_num]-exam-[n]-[term]` where:
+  - `[course_num]` — numeric course number only, no prefix (e.g. `326`, `378`)
+  - `[n]` — exam number within the semester (`1`, `2`, `3`, …)
+  - `[term]` — semester abbreviation + 2-digit year: `sp` / `fa` / `su` + `YY` (e.g. `sp26`, `fa25`)
+  - Parallel sections append a letter suffix: `326-exam-1-sp26-a.tex`, `326-exam-1-sp26-b.tex`
+  - Answer key PDF: same base name with `-key` suffix: `326-exam-1-sp26-key.pdf`
+  - Examples: `326-exam-1-sp26.tex`, `378-exam-2-fa25.tex`, `326-exam-1-sp26-a.tex`
 
 ### Design Rules
 
