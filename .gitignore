@@ -13,6 +13,9 @@ slide-*.jpg
 *_question_bank.md
 *-exam-*.lyx
 
+# But keep the reference exam template
+!references/reference_exam.lyx
+
 # macOS
 .DS_Store
 
