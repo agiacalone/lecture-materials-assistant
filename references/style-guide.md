@@ -1,6 +1,107 @@
 # Style Guide — Lecture Materials Assistant
 
-Full style specifications for all five artifact types.
+Full style specifications for all artifact types.
+
+---
+
+## Code and Pseudocode (all artifacts)
+
+### Inline Code
+
+Monospace font (Menlo), same size as surrounding text, light gray background `F5F5F5`,
+4pt padding. Used for: variable names, function calls, system calls, file paths,
+keywords referenced mid-sentence.
+
+### Code Blocks
+
+Bordered box, Menlo 10pt, 4pt internal padding. A small language label (e.g., `C`,
+`Python`, `pseudocode`) appears in muted gray above the block when the language is
+not obvious from context.
+
+**In lecture notes and study questions (.docx):** light gray background `F5F5F5`,
+1pt solid border `CCCCCC`, full column width.
+
+**In Cornell handout (.docx):** same as above but constrained to the 4.5" notes
+column. If a block would exceed ~10 lines, split across rows or use an ellipsis
+comment (`// ...`) to abbreviate.
+
+**In slides (.pptx):** dark panel `1E293B`, Menlo 11pt, body text color `F1F5F9`.
+Limited syntax highlighting:
+- Keywords / control flow: indigo `6366F1`
+- String literals: amber `F59E0B`
+- Comments: muted `94A3B8`
+- Everything else: body white `F1F5F9`
+
+Keep slide code blocks to ≤15 lines. If the relevant section is longer, show the
+key lines and replace omitted sections with a comment: `// ... (full impl in notes)`.
+
+**In question bank (.md):** standard fenced code block with language hint.
+
+**In exam (.lyx):** `\begin_inset listings` with Menlo typewriter font, as established
+by the existing exam format.
+
+### Pseudocode
+
+Use when the concept is algorithm-level and language-independent:
+- Keywords: `while`, `for`, `if / else`, `return`, `function`, `//` for comments
+- Indentation-based structure, no braces required
+- Label the block `pseudocode` — do not use a real language name
+- Prefer pseudocode over real code in Cornell handouts and study questions unless
+  the course specifically requires reading real source (e.g., OS kernel code)
+
+### Code Blanks in Cornell Handout
+
+When a code block contains a blank for students to fill in:
+- Replace the target token or line with `_______`
+- The surrounding structure (function signature, loop, surrounding lines) stays intact
+  so students can infer context from the projected slide
+- One blank per logical unit — do not blank multiple lines in the same block
+
+---
+
+## Diagrams and Visual Content (all artifacts)
+
+### When a Diagram Is Required
+
+If a concept is taught visually on a slide (state machine, memory layout, sequence
+diagram, network topology, tree/hierarchy), it must appear in the lecture notes and
+Cornell handout in some form. Do not leave major visual concepts slide-only.
+
+### Diagram Representation in .docx Artifacts
+
+The `docx` npm package cannot render vector diagrams. Use structured tables and
+bordered text boxes to approximate diagrams:
+
+| Concept | Representation |
+|---|---|
+| State machine | Table: states as cells, transitions as arrows drawn with `→` / `←` in adjacent cells |
+| Memory layout | Single-column table with labeled rows (stack, heap, BSS, text) and size annotations |
+| Process/thread hierarchy | Indented table or nested bordered boxes |
+| Timeline / sequence | Two-column table: left = actor, right = events in order |
+| Tree / hierarchy | Indented list inside a bordered box |
+
+Label every diagram with a bold caption above it: **Figure: [Description]**.
+
+### Partial Diagrams in Cornell Handout
+
+Since students do not receive slides, key diagrams must appear in the handout as
+partially-complete structures for students to fill in during lecture:
+- Draw the full structure (boxes, rows, arrows) with labels removed
+- Students write in labels as the professor walks through the slide
+- Blank cells use `_______`; blank state transition labels use `→ _______`
+- Mark the cue column with the figure caption so students know what they're looking at
+
+### Diagrams in Slides (.pptx)
+
+Use the card/panel pattern (`1E293B` background) for diagram containers. For
+structured diagrams (state machines, memory maps):
+- Boxes: rounded rectangle, panel color `334155`, border indigo `6366F1`
+- Arrows: sky `38BDF8`, 2pt weight
+- Labels: body white `F1F5F9`, Calibri 11pt
+- Active/highlighted state: indigo fill `6366F1`, white label
+
+For sequence/timeline diagrams, use a horizontal swimlane layout with one row per
+actor. Highlight the current step in amber `F59E0B`.
 
 ---
 
@@ -87,14 +188,10 @@ complete reference afterward.
 
 ### Diagrams and Visual Content
 
-For any framework, process chain, state diagram, or taxonomy that appears on a slide,
-include a representation in the handout:
-- Labeled outline or partial diagram with blank labels for students to fill in
-- Pre-drawn structure (boxes, arrows) with content removed
-- Table with row/column headers intact but cells blanked
-
-Do not leave major visual concepts slide-only. If it matters enough to be on a slide,
-it belongs in the handout in some form.
+See **Diagrams and Visual Content** in the cross-artifact section above for full
+representation rules. In the Cornell handout specifically, all diagrams must be
+partial — structure visible, labels blank — so students fill them in from the
+projected slide during lecture.
 
 ### Section Headers
 

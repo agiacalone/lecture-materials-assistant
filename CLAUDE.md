@@ -63,6 +63,15 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 # inspect slide-*.jpg
 ```
 
+## Code and Diagrams (all artifacts)
+
+- **Inline code**: Menlo, gray background `F5F5F5`. **Code blocks**: same in .docx; dark panel `1E293B` with limited syntax highlighting in slides; fenced blocks in .md; `\begin_inset listings` in .lyx.
+- **Pseudocode**: use when language-independent; label as `pseudocode`; prefer over real code in handouts and study questions unless the course requires reading real source.
+- **Code blanks in handout**: replace target token/line with `_______`, keep surrounding structure intact, one blank per logical unit.
+- **Diagrams in .docx**: approximate with structured tables and bordered boxes — the `docx` package cannot render vector graphics. Every diagram gets a bold **Figure:** caption.
+- **Partial diagrams in handout**: full structure drawn, all labels blank — students fill in from projected slide.
+- **Diagrams in slides**: boxes as rounded rectangles (`334155` fill, indigo `6366F1` border), arrows in sky `38BDF8`.
+
 ## Critical Style Rules (enforced by style-guide.md)
 
 - **Cornell handout**: Pre-distributed via Canvas before class. Students fill blanks from projected slides during lecture — blanks must map to a specific slide (cite in audit). Verbal explanation is never a blank source; it is scaffolded text in the handout and assessed through short answer questions. Key diagrams/frameworks from slides must appear in the handout as partial structures. Note-sharing is an accepted outcome — the short answer assessments are the comprehension gate, not the blanks.
