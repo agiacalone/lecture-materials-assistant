@@ -66,6 +66,7 @@ If any field is missing from the request, ask for it before proceeding.
 | Cornell handout | `[topic]_cornell_handout.docx` | 2-page student sheet with strategic blanks |
 | Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
+| Question bank | `[topic]_question_bank.docx` | ~30 questions across 4 types for exam/quiz authoring |
 | GitHub README | `README.md` | GitHub Classroom assignment |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, dark threat-intel theme |
 
@@ -115,6 +116,7 @@ cryptography_lecture_notes.docx
 cryptography_cornell_handout.docx
 cryptography_study_questions.docx
 cryptography_quiz.docx
+cryptography_question_bank.docx
 cryptography_slides.pptx
 README.md
 ```
@@ -130,6 +132,7 @@ any artifact. It covers:
 - Cornell handout: column layout, blank types, blank density, alignment audit rules
 - Study questions: difficulty tiers, question design principles, format per question
 - Pop quiz: question types, count, answer key format, timing
+- Question bank: section layout, question counts per type, answer key format, difficulty tagging
 - GitHub README: exact structure, boilerplate text (copy verbatim), Markdown rules
 - Slide deck: color palette, typography, slide structure, card/panel patterns
 

@@ -192,6 +192,93 @@ MC answers include why the distractors are wrong.
 
 ---
 
+## Question Bank (.docx)
+
+A reusable pool of questions for exam and quiz authoring. Organized by question type,
+not by difficulty — the instructor selects and assembles their own assessments from it.
+
+- **Font / page:** Arial, US Letter, 1" margins — matches lecture notes
+- **Total questions:** ~30 across four sections
+
+### Header Block
+
+```
+QUESTION BANK — [Topic in ALL CAPS]
+[Course Code] — [Course Name]
+```
+
+Course code line in navy `1F3864`, bold. Subtitle in body text:
+`For instructor use only. Select questions to assemble quizzes and exams.`
+
+### Sections and Question Counts
+
+Each section opens with a full-width dark navy `1F3864` header row (white text, bold).
+Questions are numbered continuously within each section (MC-1, MC-2 … TF-1, TF-2 …).
+
+| Section | Header label | Count |
+|---|---|---|
+| Multiple Choice | `MULTIPLE CHOICE` | 10 |
+| True / False | `TRUE / FALSE` | 8 |
+| Fill-in-the-Blank | `FILL IN THE BLANK` | 6 |
+| Short Answer | `SHORT ANSWER` | 6 |
+
+### Difficulty Tag
+
+Every question carries an inline difficulty tag in muted gray `888888` after the question number:
+
+- `[★]` — Recall
+- `[★★]` — Apply
+- `[★★★]` — Analyze
+
+Distribute difficulty across each section; do not cluster all hard questions at the end.
+
+### Format by Type
+
+**Multiple Choice**
+- Stem on its own line
+- Options on separate lines: `A.` `B.` `C.` `D.`
+- Distractors must be plausible — no throwaway wrong answers
+- One unambiguous correct answer per question
+
+**True / False**
+- Statement only — no hints in the phrasing
+- Balance: roughly half true, half false across the 8 questions
+- Avoid absolute qualifiers ("always", "never") unless they are the point being tested
+
+**Fill-in-the-Blank**
+- 1–2 blanks per sentence, represented as `_______`
+- Blanks target key terms, values, or process steps from lecture
+- Sentence must be unambiguous with the blank removed
+
+**Short Answer**
+- One focused question; 3–5 sentence response expected
+- Include a parenthetical word-count or scope hint: *(2–3 sentences)*
+- Mix factual, applied, and analytical prompts
+
+### Answer Key
+
+Page break after the last Short Answer question. Separate page with red header:
+
+```
+ANSWER KEY — NOT FOR DISTRIBUTION
+[Course Code] — [Topic]
+```
+
+Header background red `C0392B`, white text. Answers grouped by section, matching the
+question prefix labels (MC-1, MC-2 …).
+
+- **MC / T/F / Fill-in:** Answer only, plus a one-sentence explanation
+- **Short Answer:** A model response (3–5 sentences) usable as a grading rubric
+
+### Design Rules
+
+- All questions must be answerable from lecture content or assigned readings — no outside knowledge
+- Do not reuse questions verbatim from the study questions or pop quiz documents
+- Each section should cover a spread of lecture topics, not concentrate on one subtopic
+- Short answer questions must not duplicate each other in what they assess
+
+---
+
 ## GitHub Assignment (README.md)
 
 ### Structure
