@@ -19,11 +19,14 @@ Bordered box, Menlo 10pt, 4pt internal padding. A small language label (e.g., `C
 not obvious from context.
 
 **In lecture notes and study questions (.docx):** light gray background `F5F5F5`,
-1pt solid border `CCCCCC`, full column width.
+1pt solid border `CCCCCC`, full column width. Implemented in the generation script as
+a `Table` with a single cell: `shading: { fill: "F5F5F5" }`, border on all sides at
+1pt `CCCCCC`, internal padding 4pt. Each line of code is a `Paragraph` inside the
+cell using a `TextRun` with `font: "Menlo"` (fallback `"Courier New"`), size 20 (10pt).
 
-**In Cornell handout (.docx):** same as above but constrained to the 4.5" notes
-column. If a block would exceed ~10 lines, split across rows or use an ellipsis
-comment (`// ...`) to abbreviate.
+**In Cornell handout (.docx):** same construction, but the table width is constrained
+to the notes column (6480 DXA). If a block would exceed ~10 lines, split across rows
+or use an ellipsis comment (`// ...`) to abbreviate.
 
 **In slides (.pptx):** dark panel `1E293B`, Menlo 11pt, body text color `F1F5F9`.
 Limited syntax highlighting:
