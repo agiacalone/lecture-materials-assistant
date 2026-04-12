@@ -411,11 +411,11 @@ Target mix across each type: ~40% `★`, ~35% `★★`, ~25% `★★★`.
 
 ---
 
-## Exam (.tex)
+## Exam (.pdf)
 
-Assembled from one or more question bank `.md` files. Output is a plain LaTeX
-`.tex` file compiled with `pdflatex`. See `references/reference_exam.tex` for
-the full structural reference.
+Assembled from one or more question bank `.md` files. The `.tex` source is
+generated first, then compiled to PDF. The PDF is the final deliverable.
+See `references/reference_exam.tex` for the full structural reference.
 
 ### Exam Assembly Input
 
@@ -467,7 +467,7 @@ handwritten answers (omitted when `\answerstrue`).
 - **Answer key toggle:** `\newif\ifanswers` at top of file — `\answersfalse` for
   student copy, `\answerstrue` for key. Answers and model responses wrapped in
   `\ifanswers ... \fi` inline after each question stem.
-- **Compile:** `pdflatex [filename].tex`
+- **Compile:** `pdflatex [filename].tex` — run automatically after generating the `.tex`; the PDF is the final deliverable
 - **MC answer options:** `\begin{enumerate}[label=\alph*.]` nested inside each `\item`
 - **Essay continuation:** `\begin{enumerate}[resume]` to continue numbering from MC
 - **Code blocks:** `\begin{lstlisting}` with `basicstyle=\ttfamily\small`, single frame

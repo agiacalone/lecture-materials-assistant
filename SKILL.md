@@ -69,7 +69,7 @@ If any field is missing from the request, ask for it before proceeding.
 | Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
 | Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |
-| Exam | `[course]-exam-[n]-[term].tex` | Assembled from bank(s); mc+tf+code mixed in MC section, sa in essay section; answer key via `\ifanswers` toggle |
+| Exam | `[course]-exam-[n]-[term].pdf` | Assembled from bank(s), compiled via pdflatex; `.tex` source retained; answer key via `\ifanswers` toggle + recompile |
 | GitHub README | `README.md` | GitHub Classroom assignment (reading or lab/programming variant) |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, CS Modern dark slate theme |
 

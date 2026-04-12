@@ -12,11 +12,11 @@ slide-*.jpg
 # Generated question banks and exams (course-specific, not part of skill)
 *_question_bank.md
 *-exam-*.tex
+*-exam-*.pdf
 
 # LaTeX build artifacts
 *.aux
 *.log
-*.pdf
 
 # But keep the reference exam template
 !references/reference_exam.tex
