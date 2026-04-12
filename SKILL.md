@@ -107,18 +107,40 @@ file names are distinct (e.g. `326-exam-1-sp26-a.tex`, `326-exam-1-sp26-b.tex`).
 
 ## Generation Process
 
-All files are generated via Node.js scripts written and executed in the working directory.
+All files are generated via Node.js scripts written in the working directory.
 
-**Dependencies** (install once):
+**Dependencies** (install once per course repo):
 ```bash
-npm install -g docx pptxgenjs react react-dom react-icons sharp
-pip install "markitdown[docx,pptx]" --break-system-packages
+npm install docx pptxgenjs
+```
+
+**Script structure (modular — one file per artifact):**
+
+```
+generate.js              # CLI orchestrator — run this
+lib/
+  palette.js             # shared color constants (docx + pptx)
+  docx-helpers.js        # shared docx construction helpers
+  pptx-helpers.js        # createSlideHelpers() factory
+generators/
+  lecture-notes.js       # → [topic]_lecture_notes.docx
+  cornell-handout.js     # → [topic]_cornell_handout.docx
+  study-questions.js     # → [topic]_study_questions.docx
+  quiz.js                # → [topic]_quiz.docx
+  slides.js              # → [topic]_slides.pptx
+  readme.js              # → README.md
+```
+
+**Running:**
+```bash
+node generate.js              # all six artifacts
+node generate.js --slides     # one artifact only
+node generators/slides.js     # same, standalone
 ```
 
 **Packages:**
 - `.docx` → `docx` npm package (v9+)
 - `.pptx` → `pptxgenjs` npm package (v4+)
-- Icons → `react-icons` rasterized via `sharp` at 256px minimum
 
 **QA workflow for slides (run manually — Claude Code has no in-chat image display):**
 ```bash

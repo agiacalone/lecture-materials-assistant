@@ -29,11 +29,10 @@ Copy `CLAUDE.md.example` to your course project directory, rename it `CLAUDE.md`
 
 ## Dependencies
 
-Install once:
+Install once per course repo:
 
 ```bash
-npm install -g docx pptxgenjs react react-dom react-icons sharp
-pip install "markitdown[docx,pptx]" --break-system-packages
+npm install docx pptxgenjs
 ```
 
 For exam PDF compilation:
@@ -53,6 +52,32 @@ brew install basictex && sudo tlmgr install enumitem listings geometry
 ```
 Generate lecture materials for [TOPIC] in [COURSE].
 Cover: [KEY CONCEPTS]. Case studies: [EXAMPLES]. ~[N] minutes.
+```
+
+The skill generates a modular script structure in your working directory:
+
+```
+generate.js              # CLI orchestrator
+lib/
+  palette.js
+  docx-helpers.js
+  pptx-helpers.js
+generators/
+  lecture-notes.js
+  cornell-handout.js
+  study-questions.js
+  quiz.js
+  slides.js
+  readme.js
+```
+
+Run all artifacts at once or regenerate a single one:
+
+```bash
+node generate.js              # all six artifacts
+node generate.js --slides     # slides only
+node generate.js --cornell    # Cornell handout only
+node generators/slides.js     # same, standalone
 ```
 
 ### Generating a question bank

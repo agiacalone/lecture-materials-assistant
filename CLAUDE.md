@@ -31,8 +31,13 @@ lecture-designer/
 **Generation flow:**
 1. User specifies topic + 5 course context fields (course code, student level, lecture length, assessment format, adversarial-thinking)
 2. Claude reads `SKILL.md` + `style-guide.md`
-3. Claude writes a Node.js script (`[topic]_generate.js`) in the user's working directory
-4. User runs `node [topic]_generate.js` → produces `.docx`/`.pptx`/`.md` artifacts
+3. Claude writes a modular Node.js script structure in the user's working directory:
+   - `lib/palette.js` — shared color constants
+   - `lib/docx-helpers.js` — shared docx construction helpers (re-exports `docx` constructors)
+   - `lib/pptx-helpers.js` — `createSlideHelpers(pptx, total, course, topic)` factory
+   - `generators/lecture-notes.js`, `generators/cornell-handout.js`, `generators/study-questions.js`, `generators/quiz.js`, `generators/slides.js`, `generators/readme.js` — one per artifact, each independently runnable
+   - `generate.js` — CLI orchestrator: `node generate.js [--all|--notes|--cornell|--questions|--quiz|--slides|--readme]`
+4. User runs `node generate.js` (all) or `node generate.js --slides` (one artifact) or `node generators/slides.js` (standalone)
 
 For exam generation, Claude reads `references/reference_exam.tex` as a structural
 reference and assembles a `.tex` file directly (no Node.js script needed).
