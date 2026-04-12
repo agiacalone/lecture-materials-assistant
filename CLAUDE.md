@@ -64,7 +64,7 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 
 ## Critical Style Rules (enforced by style-guide.md)
 
-- **Cornell blanks**: Every blank must have a declared source (slide number, lecture notes section, or "verbal"). Never leave silent gaps. Run a blank audit before finalizing.
+- **Cornell handout**: Students do not receive slides — the handout is their only reference during and after class. Key frameworks, diagrams, and process chains from slides must be represented in the handout (as partial diagrams or structured scaffolding). Every blank answer must reach students via verbal delivery or handout context — there is no "check the slide" fallback. Run a blank audit before finalizing.
 - **Slides**: Theme colors are slate `#0F172A`, indigo `#6366F1`, amber `#F59E0B`. Every content slide needs an indigo stripe and section badge.
 - **Study questions**: Attacker mindset, open-ended, and case-study reference are mandatory across the 10 questions.
 - **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.

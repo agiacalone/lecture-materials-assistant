@@ -50,6 +50,17 @@ Dark navy header `1F3864` white text; alternating white / `F0F4FA` rows.
 
 ## Cornell Handout (.docx)
 
+**Design premise:** Students do not receive a copy of the lecture slides. The handout
+is their only visual reference during and after class. It must function as both a
+note-taking tool in the moment and a complete study document afterward.
+
+This means:
+- Key frameworks, taxonomies, and diagrams from slides must be represented in the handout
+  (as partial diagrams, labeled outlines, or structured scaffolding — not left slide-only)
+- Scaffolded content must be sufficient for a student to reconstruct the lecture without slides
+- Every blank answer must reach the student through verbal delivery — there is no
+  "they can check the slide" fallback
+
 ### Layout
 
 2-column table, full width:
@@ -63,12 +74,23 @@ Dark navy header `1F3864` white text; alternating white / `F0F4FA` rows.
 |---|---|
 | Fill-in-the-blank mid-sentence | `exploits _______, not software` |
 | Open bullet with label | `• Cognitive load — attacks timed for _______` |
-| Open line with italic hint | `*Key IOC to spot* _______` |
+| Open line with italic hint | `*Key concept* _______` |
 | Synthesis bullets | `Key lesson: _______` |
 
 **Blank density:** ~40% blank / 60% scaffolded by default.
 - More scaffolded → intro topics or weaker students
 - More open → advanced topics or strong students
+
+### Diagrams and Visual Content
+
+For any framework, process chain, state diagram, or taxonomy that appears on a slide,
+include a representation in the handout:
+- Labeled outline or partial diagram with blank labels for students to fill in
+- Pre-drawn structure (boxes, arrows) with content removed
+- Table with row/column headers intact but cells blanked
+
+Do not leave major visual concepts slide-only. If it matters enough to be on a slide,
+it belongs in the handout in some form.
 
 ### Section Headers
 
@@ -90,18 +112,19 @@ Key terms with blank definitions.
 
 ## Blank Audit (MANDATORY)
 
-Every blank must have a declared source. Audit before declaring the handout complete.
+Every blank must have a declared source. Students have no slides to fall back on —
+every answer must reach them through verbal delivery or handout scaffolding.
 
 | Blank type | Required source |
 |---|---|
-| Specific fact (%, name, dollar amount) | Must appear on a slide |
-| Definition or concept | Must appear on a slide or stated verbally |
-| Process / attack chain step | Must appear on a case study or process slide |
-| Synthesis / open-ended | No source needed — mark cue column *(synthesis)* |
-| Verbal-only content | Mark cue column *(verbal)* so professor knows to say it |
+| Specific fact (%, name, value) | Professor must state verbally — mark cue column *(verbal)* |
+| Definition or concept | Stated verbally OR included as scaffolded context in the handout |
+| Process / chain step | Stated verbally OR represented in a partial diagram in the handout |
+| Synthesis / open-ended | No fixed source — mark cue column *(synthesis)* |
 
-**Never leave silent gaps.** If a blank's answer is only in the lecture notes,
-either add it to a slide or flag it *(verbal)*.
+**Never leave silent gaps.** If neither the handout scaffolding nor verbal delivery
+supplies the answer, either add context to the handout or flag it *(verbal)* so the
+professor knows to say it explicitly.
 
 ---
 
