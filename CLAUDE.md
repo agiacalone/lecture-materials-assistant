@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-**lecture-designer** is a Claude Code skill that generates production-ready lecture materials for CS courses. It has no build system or runtime — its "code" is the skill definition and style guide that Claude reads to generate Node.js scripts on demand.
+**lecture-materials-assistant** is a Claude Code skill that generates production-ready lecture materials for CS courses. It has no build system or runtime — its "code" is the skill definition and style guide that Claude reads to generate Node.js scripts on demand.
 
 ## Skill Invocation
 
@@ -19,7 +19,7 @@ When deployed as a skill, the entry point is `SKILL.md`. When invoked, Claude mu
 ## Architecture
 
 ```
-lecture-designer/
+lecture-materials-assistant/
 ├── SKILL.md                       # Skill metadata, workflow, artifact specs, file naming
 ├── CLAUDE.md.example              # Template users copy to their course project directory
 ├── references/

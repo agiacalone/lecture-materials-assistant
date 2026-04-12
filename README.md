@@ -1,4 +1,4 @@
-# lecture-designer
+# lecture-materials-assistant
 
 A [Claude Code](https://claude.ai/code) skill for generating production-ready lecture materials for university CS courses.
 
@@ -62,13 +62,13 @@ Install and use the skill inside your Distrobox container rather than on the imm
 Create a container if needed:
 
 ```bash
-distrobox create --name lecture-designer --image fedora:latest
+distrobox create --name lecture-materials-assistant --image fedora:latest
 ```
 
 Enter the container and install the base tools:
 
 ```bash
-distrobox enter lecture-designer
+distrobox enter lecture-materials-assistant
 sudo dnf install -y git nodejs npm
 ```
 
@@ -114,7 +114,7 @@ Fill in the five course context fields in `CLAUDE.md`.
 
 ```markdown
 ## Skills
-- Use the lecture materials assistant skill at ~/.claude/skills/lecture-materials-assistant/SKILL.md
+- Use the lecture-materials-assistant skill at ~/.claude/skills/lecture-materials-assistant/SKILL.md
   for all lecture content generation requests.
 ```
 
