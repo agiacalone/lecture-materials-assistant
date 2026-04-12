@@ -43,7 +43,7 @@ lecture-designer/
 | `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
 | `[topic]_question_bank.docx` | Question bank | ~50 questions: 20 MC, 12 T/F, 10 fill-in-the-blank, 8 short answer; scoped to full topic (2–4 sessions); subtopic grouping within each section |
 | `[topic]_readme.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
-| `[topic]_slides.pptx` | Slide deck | 14–18 slides, threat-intel dark theme, mandatory red stripe + badge |
+| `[topic]_slides.pptx` | Slide deck | 14–18 slides, CS Modern dark slate theme, mandatory indigo stripe + badge |
 
 ## Required npm/pip Dependencies (user installs once)
 
@@ -65,7 +65,7 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 ## Critical Style Rules (enforced by style-guide.md)
 
 - **Cornell blanks**: Every blank must have a declared source (slide number, lecture notes section, or "verbal"). Never leave silent gaps. Run a blank audit before finalizing.
-- **Slides**: Theme colors are navy `#0D1B2A`, red `#C0392B`, gold `#F39C12`. Every content slide needs a red stripe and section badge.
+- **Slides**: Theme colors are slate `#0F172A`, indigo `#6366F1`, amber `#F59E0B`. Every content slide needs an indigo stripe and section badge.
 - **Study questions**: Attacker mindset, open-ended, and case-study reference are mandatory across the 10 questions.
 - **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.
 - **Question bank**: Topic-wide scope (2–4 sessions) — requires full subtopic list before generating; ask if not provided. Questions numbered by type prefix (MC-1, TF-1, etc.) and grouped by subtopic within each section. Every question carries a `[★]`/`[★★]`/`[★★★]` difficulty tag (~40% Recall, ~35% Apply, ~25% Analyze). Every subtopic must appear in at least two question types. Do not reuse questions verbatim from study questions or pop quiz.

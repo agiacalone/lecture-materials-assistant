@@ -360,19 +360,20 @@ approval.
 
 ## Slide Deck (.pptx)
 
-### Color Palette — "Threat Intelligence" Dark Theme
+### Color Palette — "CS Modern" Dark Theme
 
 | Role | Color |
 |---|---|
-| Background | deep navy `0D1B2A` |
-| Panel / card background | `152536` |
-| Secondary panel | `1A2D42` |
-| Primary accent | threat red `C0392B` / bright red `E74C3C` |
-| Body text | ice white `D6E4F0` |
-| Muted text | `8BA5BF` |
-| Warning / stat | gold `F39C12` |
-| Defense / positive | green `27AE60` |
-| Calm accent | blue `2980B9` |
+| Background | deep slate `0F172A` |
+| Panel / card background | `1E293B` |
+| Secondary panel | `334155` |
+| Primary accent | indigo `6366F1` |
+| Bright accent (hover / highlight) | `818CF8` |
+| Body text | `F1F5F9` |
+| Muted text | `94A3B8` |
+| Warning / stat | amber `F59E0B` |
+| Positive / success | emerald `22C55E` |
+| Secondary accent | sky `38BDF8` |
 
 ### Layout
 
@@ -382,14 +383,14 @@ approval.
 
 ### Every Content Slide Must Have
 
-- Red top stripe (6pt, full width)
-- Section tag badge (red rectangle, white all-caps label, top-left)
-- Slide title (large, white or red, Calibri Black)
+- Indigo top stripe (6pt, full width, `6366F1`)
+- Section tag badge (indigo rectangle `6366F1`, white all-caps label, top-left)
+- Slide title (large, white or indigo, Calibri Black)
 - Footer: `[COURSE] — [Topic]   |   N / TOTAL` centered, muted, 8pt
 
 ### Card / Panel Pattern
 
-Dark panel `152536` with shadow; left accent bar in section color for emphasis rows.
+Dark panel `1E293B` with shadow; left accent bar in section color for emphasis rows.
 
 ### Icons
 
@@ -406,9 +407,9 @@ Dark panel `152536` with shadow; left accent bar in section color for emphasis r
 | 3 | Opening hook / motivation |
 | 4 | Core thesis / central argument |
 | 5–6 | Framework or taxonomy (tables, grids, icon rows) |
-| 7–10 | Case studies (4-column attack/process chain cards + key lesson bar) |
-| 11 | Human factors or "why this matters" |
-| 12 | Activity slide (forensics, scenario, or live demo) |
-| 13–14 | Defense or resolution strategies |
+| 7–10 | Case studies (4-column process/event chain cards + key lesson bar) |
+| 11 | Real-world context / implications |
+| 12 | Activity slide (problem, scenario, or live demo) |
+| 13–14 | Solutions / best practices |
 | 15 | Discussion questions |
 | 16 | Closing / key takeaways + reading list |

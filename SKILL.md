@@ -68,7 +68,7 @@ If any field is missing from the request, ask for it before proceeding.
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
 | Question bank | `[topic]_question_bank.docx` | ~50 questions across 4 types, scoped to full topic (2–4 sessions) |
 | GitHub README | `README.md` | GitHub Classroom assignment |
-| Slide deck | `[topic]_slides.pptx` | 14–18 slides, dark threat-intel theme |
+| Slide deck | `[topic]_slides.pptx` | 14–18 slides, CS Modern dark slate theme |
 
 **Default (generate everything — single session):**
 > "Generate lecture materials for [TOPIC] in [COURSE]. Cover: [KEY CONCEPTS]. Case studies: [EXAMPLES]. ~[N] minutes."
@@ -178,9 +178,9 @@ Required design rules:
 3. Opening hook / motivation
 4. Core thesis
 5–6. Framework or taxonomy
-7–10. Case studies (4-column attack chain + key lesson bar)
-11. Human factors
+7–10. Case studies (4-column process/event chain + key lesson bar)
+11. Real-world context / implications
 12. Activity slide
-13–14. Defense strategies
+13–14. Solutions / best practices
 15. Discussion questions
 16. Closing / key takeaways + reading list
