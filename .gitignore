@@ -1,0 +1,15 @@
+# Generated lecture artifacts (keep out of skill repo)
+*_generate.js
+*_notes.docx
+*_cornell.docx
+*_questions.docx
+*_slides.pptx
+*_readme.md
+slide-*.jpg
+*.pdf
+
+# macOS
+.DS_Store
+
+# Node (if scripts are ever run here)
+node_modules/

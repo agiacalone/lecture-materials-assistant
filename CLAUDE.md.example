@@ -1,0 +1,14 @@
+# CLAUDE.md
+
+## Skills
+
+- Use the lecture materials assistant skill at `~/.claude/skills/lecture-materials-assistant/SKILL.md`
+  for all lecture content generation requests.
+
+## Course Context
+
+<!-- Optional: pre-populate so you don't have to re-specify each session -->
+<!-- Course code + name: CECS 378 — Introduction to Computer Security        -->
+<!-- Student level:      Upper-division CS majors, strong programming background, minimal security background -->
+<!-- Lecture length:     ~75 minutes                                          -->
+<!-- Assessment format:  GitHub Classroom (Markdown), in-class activities     -->
