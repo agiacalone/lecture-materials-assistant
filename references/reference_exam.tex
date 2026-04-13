@@ -15,6 +15,7 @@
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{fontenc}
+\usepackage{needspace}
 
 % --- Answer key toggle ---
 \newif\ifanswers
@@ -119,6 +120,7 @@ Partial credit will be given for incomplete answers.}
 
 \begin{enumerate}[resume]
 
+\needspace{3in}
 \item [Essay Q1: compare/contrast, explain a tradeoff, or analyze a scenario.
        Should require synthesis --- not answerable from a single definition.]
 \ifanswers
@@ -127,11 +129,10 @@ Partial credit will be given for incomplete answers.}
   \par Full credit requires [specific criterion A] AND [specific criterion B].
   \par Partial credit for [partial criterion].
 \else
-  \bigskip\bigskip\bigskip\bigskip\bigskip
-  \bigskip\bigskip\bigskip\bigskip\bigskip
-  \bigskip\bigskip\bigskip\bigskip
+  \vspace{2.5in}
 \fi
 
+\needspace{3in}
 \item [Essay Q2: second synthesis or code-interpretation question.]
 \ifanswers
   \par\medskip\noindent\textbf{Model answer:}
@@ -139,9 +140,7 @@ Partial credit will be given for incomplete answers.}
   \par Full credit requires [specific criterion A] AND [specific criterion B].
   \par Partial credit for [partial criterion].
 \else
-  \bigskip\bigskip\bigskip\bigskip\bigskip
-  \bigskip\bigskip\bigskip\bigskip\bigskip
-  \bigskip\bigskip\bigskip\bigskip
+  \vspace{2.5in}
 \fi
 
 \end{enumerate}

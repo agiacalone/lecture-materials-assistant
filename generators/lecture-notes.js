@@ -5,6 +5,7 @@ const path = require("path");
 const { topicSlug } = require("../lib/context");
 const {
   compileLatex,
+  texBriefingSection,
   texBulletList,
   texCallout,
   texComparisonTable,
@@ -12,8 +13,6 @@ const {
   texHook,
   texPlainSection,
   texPreamble,
-  texSectionRule,
-  texTalkingPoints,
   texEscape,
 } = require("../lib/tex-helpers");
 
@@ -24,7 +23,8 @@ function generate(config, options) {
   const courseLabel = `${course.code} \u2014 ${course.name}`;
 
   const lines = [];
-  lines.push(texPreamble(lecture.topic, courseLabel));
+  // Instructor notes: tight spacing, smaller font, narrower margins for quick-ref density
+  lines.push(texPreamble(lecture.topic, courseLabel, { fontSize: "11pt", margin: "0.75in", tightSpacing: true }));
   lines.push("\\begin{document}");
   lines.push("\\thispagestyle{fancy}");
   lines.push(texDocHeader(lecture.topic, "Lecture Notes \u2014 with Talking Points", courseLabel));
@@ -39,23 +39,19 @@ function generate(config, options) {
   lines.push(texPlainSection("Learning Objectives"));
   lines.push(texBulletList(lecture.objectives));
 
-  // Numbered sections
+  // Numbered sections — briefing two-column layout (points left, talking points right)
   lecture.sections.forEach((section, index) => {
-    lines.push(texSectionRule(`${section.title} (${section.minutes || "TBD"} min)`, index));
-
-    if (section.overview) {
-      lines.push(`\\noindent ${texEscape(section.overview)}\n`);
-    }
-
-    if (section.points && section.points.length > 0) {
-      lines.push(texBulletList(section.points));
-    }
-
     const talkingPoints = section.talkingPoints || section.speakerNotes;
-    if (talkingPoints && talkingPoints.length > 0) {
-      lines.push(texTalkingPoints(talkingPoints));
-    }
+    lines.push(texBriefingSection(
+      section.title,
+      index,
+      section.minutes,
+      section.overview,
+      section.points,
+      talkingPoints
+    ));
 
+    // Callouts and tables remain full-width below the two-column zone
     (section.callouts || []).forEach((c) => {
       if (c && c.text) {
         lines.push(texCallout(c.label, c.text));

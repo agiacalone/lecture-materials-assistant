@@ -2,14 +2,18 @@
 
 const fs = require("fs");
 const path = require("path");
+const { spawnSync } = require("child_process");
 const { topicSlug } = require("../lib/context");
-const {
-  compileLatex,
-  texDocHeader,
-  texEscape,
-  texPreamble,
-} = require("../lib/tex-helpers");
+const { texPreamble, texEscape } = require("../lib/tex-helpers");
 
+// Points per question type — mirrors exam conventions
+const PTS = { mc: 1, tf: 1, code: 1, sa: 2 };
+
+function totalPoints(questions) {
+  return questions.reduce((sum, q) => sum + (PTS[q.type] || 1), 0);
+}
+
+// Derive questions from spec or fall back to generic stubs
 function deriveQuiz(config) {
   if (Array.isArray(config.lecture.quizQuestions) && config.lecture.quizQuestions.length > 0) {
     return config.lecture.quizQuestions;
@@ -32,11 +36,6 @@ function deriveQuiz(config) {
       rubric: "1 point for correct selection; no partial credit. Distractors represent common misconceptions.",
     },
     {
-      type: "sa",
-      prompt: `Explain the most important tradeoff in ${section0}.`,
-      rubric: "2 points: name the tradeoff (1 pt), defend one side with a concrete example from lecture (1 pt).",
-    },
-    {
       type: "mc",
       prompt: `Which failure mode does the lecture warn about most strongly?`,
       options: [
@@ -47,6 +46,11 @@ function deriveQuiz(config) {
       ],
       answer: "b",
       rubric: "1 point for correct selection; no partial credit.",
+    },
+    {
+      type: "sa",
+      prompt: `Explain the most important tradeoff in ${section0}.`,
+      rubric: "2 points: name the tradeoff (1 pt), defend one side with a concrete example from lecture (1 pt).",
     },
     {
       type: "sa",
@@ -61,53 +65,149 @@ function deriveQuiz(config) {
   ];
 }
 
+// --- Renderers ---
+
 function renderMC(q, num) {
+  const letter = String(q.answer || "").trim().replace(/[().]/g, "").toLowerCase();
   const opts = (q.options || [])
-    .map((opt, i) => `  \\item[(${String.fromCharCode(97 + i)})] ${texEscape(opt)}`)
+    .map((opt, i) => `  \\item ${texEscape(opt)}`)
     .join("\n");
-  return `\\noindent\\textbf{${num}.} ${texEscape(q.prompt)}\n\\begin{enumerate}[leftmargin=2em,topsep=2pt,itemsep=0pt]\n${opts}\n\\end{enumerate}\n\\vspace{1em}\n`;
+  return [
+    `\\item ${texEscape(q.prompt)}`,
+    `\\ifanswers\\quad\\textbf{Answer: ${texEscape(letter || "?")}}\\fi`,
+    `\\begin{enumerate}[label=\\alph*.,topsep=2pt,itemsep=1pt,leftmargin=2em]`,
+    opts,
+    `\\end{enumerate}`,
+    `\\medskip`,
+  ].join("\n");
 }
 
 function renderSA(q, num) {
-  return `\\noindent\\textbf{${num}.} ${texEscape(q.prompt)}\n\n\\vspace{3em}\n`;
+  const space = "\\vspace{2.5in}";
+  return [
+    `\\needspace{3in}`,  // eject page if < 3in remains (question text + 2.5in answer space)
+    `\\item ${texEscape(q.prompt)}`,
+    `\\ifanswers`,
+    `  \\par\\medskip\\noindent\\textbf{Model answer:} ${texEscape(q.rubric || "")}`,
+    `\\else`,
+    `  ${space}`,
+    `\\fi`,
+    `\\medskip`,
+  ].join("\n");
 }
+
+// --- Build TeX content string ---
+
+function buildTex(config, questions) {
+  const { course, lecture } = config;
+  const courseLabel = `${course.code} \u2014 ${course.name}`;
+  const pts = totalPoints(questions);
+
+  const mcQuestions = questions.filter((q) => q.type === "mc" || q.type === "tf" || q.type === "code");
+  const saQuestions = questions.filter((q) => q.type === "sa");
+
+  const lines = [];
+
+  // Preamble (standard settings — not instructor briefing mode)
+  lines.push(texPreamble(lecture.topic, courseLabel));
+
+  // Answer toggle — must be in preamble area, before \begin{document}
+  lines.push("\\newif\\ifanswers");
+  lines.push("\\answersfalse  % compiled twice: once false (student), once true (key)");
+
+  lines.push("\\begin{document}");
+  lines.push("\\thispagestyle{fancy}");
+
+  // Header — matches exam format
+  lines.push([
+    `\\noindent\\textbf{Name:}~\\rule{0.45\\linewidth}{0.4pt}%`,
+    `\\hspace{0.04\\linewidth}%`,
+    `\\textbf{Date:}~\\rule{0.20\\linewidth}{0.4pt}`,
+    ``,
+    `\\medskip`,
+    `\\noindent\\textbf{${texEscape(courseLabel)}: ${texEscape(lecture.topic)} --- Pop Quiz (${pts}~pts)}`,
+    ``,
+    `\\ifanswers`,
+    `  \\begin{center}\\large\\textbf{*** ANSWER KEY --- NOT FOR DISTRIBUTION ***}\\end{center}`,
+    `\\fi`,
+  ].join("\n"));
+
+  // Directions
+  lines.push([
+    `\\paragraph*{Directions.}`,
+    `\\textit{All questions are directly answerable from lecture and slide content.`,
+    `You may use your Cornell handout.}`,
+  ].join("\n"));
+
+  // MC section
+  if (mcQuestions.length > 0) {
+    const mcPts = mcQuestions.reduce((s, q) => s + (PTS[q.type] || 1), 0);
+    lines.push([
+      `\\paragraph*{Multiple Choice (${mcPts === mcQuestions.length ? "1" : "varies"}~pt each).`,
+      `Circle the best answer.`,
+      `\\textbf{Do not} write the letter in the margin---it will be marked incorrect.}`,
+    ].join(" "));
+    lines.push("\\begin{enumerate}");
+    mcQuestions.forEach((q, i) => lines.push(renderMC(q, i + 1)));
+    lines.push("\\end{enumerate}");
+  }
+
+  // SA section
+  if (saQuestions.length > 0) {
+    lines.push([
+      `\\paragraph*{Short Answer (2~pts each).`,
+      `Answer completely but as briefly as possible.`,
+      `Partial credit is given for incomplete answers.}`,
+    ].join(" "));
+    // Continue numbering from MC section if both exist
+    const resumeOpt = mcQuestions.length > 0 ? "[resume]" : "";
+    lines.push(`\\begin{enumerate}${resumeOpt}`);
+    saQuestions.forEach((q, i) => lines.push(renderSA(q, mcQuestions.length + i + 1)));
+    lines.push("\\end{enumerate}");
+  }
+
+  lines.push("\\end{document}\n");
+  return lines.join("\n");
+}
+
+// --- Double compile: student copy + answer key ---
+
+function compileStudentAndKey(texContent, slug, outputDir) {
+  const latexArgs = ["-interaction=nonstopmode", "-output-directory", outputDir];
+
+  // Student copy (answersfalse)
+  const studentTex = path.join(outputDir, `${slug}_quiz.tex`);
+  fs.writeFileSync(studentTex, texContent);
+  spawnSync("pdflatex", [...latexArgs, studentTex], { stdio: "ignore" });
+  spawnSync("pdflatex", [...latexArgs, studentTex], { stdio: "ignore" });
+
+  // Key copy (answerstrue)
+  const keyContent = texContent.replace("\\answersfalse", "\\answerstrue");
+  const keyTex = path.join(outputDir, `${slug}_quiz_key.tex`);
+  fs.writeFileSync(keyTex, keyContent);
+  spawnSync("pdflatex", [...latexArgs, keyTex], { stdio: "ignore" });
+  spawnSync("pdflatex", [...latexArgs, keyTex], { stdio: "ignore" });
+
+  const studentPdf = path.join(outputDir, `${slug}_quiz.pdf`);
+  const keyPdf = path.join(outputDir, `${slug}_quiz_key.pdf`);
+
+  if (!fs.existsSync(studentPdf)) {
+    throw new Error(`Quiz student PDF not produced. Check ${studentTex} for errors.`);
+  }
+  if (!fs.existsSync(keyPdf)) {
+    throw new Error(`Quiz key PDF not produced. Check ${keyTex} for errors.`);
+  }
+
+  return studentPdf;
+}
+
+// --- Entry point ---
 
 function generate(config, options) {
   const slug = topicSlug(config);
-  const texPath = path.join(options.outputDir, `${slug}_quiz.tex`);
-  const { course, lecture } = config;
-  const courseLabel = `${course.code} \u2014 ${course.name}`;
   const questions = deriveQuiz(config);
-
-  const lines = [];
-  lines.push(texPreamble(lecture.topic, courseLabel));
-  lines.push("\\begin{document}");
-  lines.push("\\thispagestyle{fancy}");
-  lines.push(texDocHeader(lecture.topic, "Pop Quiz", courseLabel));
-  lines.push("\\noindent\\textbf{Name:}\\enspace\\underline{\\hspace{6cm}}\\qquad\\textbf{Date:}\\enspace\\underline{\\hspace{3cm}}\\\\[1em]");
-  lines.push("\\noindent\\textit{All questions are directly answerable from the lecture and slide content.}\\\\[0.5em]");
-
-  questions.forEach((q, i) => {
-    lines.push(q.type === "mc" ? renderMC(q, i + 1) : renderSA(q, i + 1));
-  });
-
-  // Answer key on a new page
-  lines.push("\\newpage");
-  lines.push("{\\color{red}\\rule{\\linewidth}{2pt}}");
-  lines.push("\\vspace{0.3em}");
-  lines.push("{\\color{red}\\Large\\textbf{ANSWER KEY --- INSTRUCTOR COPY}}");
-  lines.push("\\vspace{0.2em}");
-  lines.push("{\\color{red}\\rule{\\linewidth}{2pt}}\\\\[0.8em]");
-
-  questions.forEach((q, i) => {
-    const answerNote = q.type === "mc" ? ` Answer: (${q.answer}).` : "";
-    lines.push(`\\noindent\\textbf{${i + 1}.}${answerNote} ${texEscape(q.rubric || "")}\\\\[0.5em]`);
-  });
-
-  lines.push("\\end{document}\n");
-
-  fs.writeFileSync(texPath, lines.join("\n"));
-  return compileLatex(texPath, options.outputDir);
+  const texContent = buildTex(config, questions);
+  return compileStudentAndKey(texContent, slug, options.outputDir);
 }
 
 module.exports = { generate };

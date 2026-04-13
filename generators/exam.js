@@ -19,9 +19,13 @@ function buildExamTex(config) {
   ];
 
   questions.forEach((question) => {
+    const isSA = !question.type || question.type === "sa";
+    if (isSA) lines.push("\\needspace{3in}");
     lines.push(`\\item ${question.prompt} (${question.points} pts)`);
     lines.push("\\ifanswers");
     lines.push(question.answer || "Answer key pending.");
+    lines.push("\\else");
+    lines.push(isSA ? "\\vspace{2.5in}" : "");
     lines.push("\\fi");
   });
 

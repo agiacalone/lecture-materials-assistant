@@ -1,0 +1,224 @@
+{
+  "course": {
+    "code": "CECS 326",
+    "name": "Operating Systems",
+    "studentLevel": "Upper-division CS majors with C and systems programming background",
+    "lectureLengthMinutes": 75,
+    "assessmentFormat": "GitHub Classroom lab and in-class activities",
+    "adversarialThinking": false
+  },
+  "lecture": {
+    "topic": "Deadlock",
+    "slug": "deadlock",
+    "summary": "Motivate deadlock through the Apollo Guidance Computer lock-leak bug, formalize the four Coffman conditions, survey prevention/avoidance/detection strategies, and connect to modern lock discipline via language evolution.",
+    "openingHook": "On 21 July 1969, Michael Collins orbited the Moon alone while Armstrong and Aldrin walked on the surface. In 2026, researchers found a bug in the AGC code that — under the right conditions — would have silently disabled all gyro operations, leaving Collins unable to realign the guidance platform with no diagnostic clue pointing to the fix. Four bytes. One missed error path. One lock that was never released.",
+    "objectives": [
+      "Explain what deadlock is and why it is distinct from livelock and starvation.",
+      "Apply the four Coffman conditions to classify a given deadlock scenario.",
+      "Evaluate the tradeoffs among prevention, avoidance, detection, and the ostrich algorithm.",
+      "Connect lock-leak bugs to modern language mechanisms that eliminate the error class."
+    ],
+    "keyConcepts": [
+      "Deadlock",
+      "Coffman conditions",
+      "Lock discipline",
+      "Deadlock prevention and detection"
+    ],
+    "caseStudies": [
+      "AGC LGYRO lock leak — lock acquired on gyro torque, never released on cage-switch error path (CWE-772)",
+      "POSIX pthread_mutex — abandoned if thread dies holding lock; same failure mode as AGC, 55 years later",
+      "MySQL deadlock detector — kills the transaction with smallest rollback cost; real-world detection + recovery",
+      "Rust MutexGuard — ownership system makes lock leak a compile-time error"
+    ],
+    "activities": [
+      "Classify the AGC bug using the four Coffman conditions — which hold, which do not?",
+      "Given a POSIX program sketch, identify every exit path and mark which release the semaphore."
+    ],
+    "takeaways": [
+      "Deadlock is permanent blocking of a process set; distinguishable from livelock and starvation.",
+      "All four Coffman conditions must hold simultaneously — break any one to prevent deadlock.",
+      "Circular wait is sufficient but not necessary — an abandoned lock produces the same outcome.",
+      "Lock leaks (CWE-772) are the primary cause; language evolution progressively moves enforcement to the compiler.",
+      "POSIX semaphores are manual — test every error path explicitly."
+    ],
+    "discussionQuestions": [
+      "Which Coffman condition is cheapest to eliminate in software design, and why?",
+      "The AGC had no detection. Collins's DSKY accepted commands silently. How does detection failure compare to deadlock itself?",
+      "Why do lock leaks still appear in CVE databases if Rust exists?"
+    ],
+    "references": [
+      "JUXT Blog: 'A bug on the dark side of the Moon' (April 2026) — https://www.juxt.pro/blog/a-bug-on-the-dark-side-of-the-moon/",
+      "Coffman, E.G. et al. (1971). System Deadlocks. ACM Computing Surveys 3(2).",
+      "MITRE CWE-772: Missing Release of Resource after Effective Lifetime",
+      "Apollo-11 AGC source (IMU_MODE_SWITCHING_ROUTINES.agc) — https://github.com/chrislgarry/Apollo-11"
+    ],
+    "vocabulary": [
+      "deadlock",
+      "livelock",
+      "starvation",
+      "mutual exclusion",
+      "hold and wait",
+      "no preemption",
+      "circular wait",
+      "lock leak",
+      "abandoned mutex"
+    ],
+    "sections": [
+      {
+        "title": "Motivation: A Real Bug, 57 Years Later",
+        "minutes": 15,
+        "overview": "Ground deadlock in a concrete, consequential failure before introducing any formal vocabulary. The AGC bug is a lock leak (CWE-772) that produces indefinite blocking — a degenerate but real form of deadlock.",
+        "points": [
+          "The AGC had 2KB of RAM, a 1MHz clock, and a real-time multitasking OS with shared resource locks.",
+          "LGYRO is a shared lock protecting gyro torque hardware — acquired on entry, released on normal completion only.",
+          "If the crew hit the cage switch mid-torque, the BADEND error path exited without releasing the lock — two instructions, four bytes missing.",
+          "Every subsequent gyro operation sleeps waiting for a wake that never arrives. No alarm. DSKY accepts commands and does nothing."
+        ],
+        "talkingPoints": [
+          "Ask the class: what kind of bug is this? Take answers. Then explain: it is a lock leak (CWE-772), which produces indefinite blocking.",
+          "Stress that the computer accepted commands normally — everything except gyro ops worked. That is what makes silent deadlock so dangerous.",
+          "Discussion prompt: Collins had been trained to restart on computer faults. Nothing about this failure looked like a computer fault. What would you do?",
+          "The AGC's restart logic cleared LGYRO as a side effect of full memory initialization — so any test that triggered a restart after the bug saw it recover cleanly. Recovery mechanisms can mask latent resource bugs during testing."
+        ],
+        "callouts": [
+          {
+            "label": "KEY",
+            "text": "A lock leak is not a theoretical concern. It grounded an entire subsystem on a lunar mission. Four bytes missing from one error path."
+          }
+        ],
+        "blanks": [
+          {
+            "cue": "The bug",
+            "template": "LGYRO is acquired on entry to the gyro torque routine but never released when the error path exits via _______."
+          },
+          {
+            "cue": "The effect",
+            "template": "Once the lock is stuck: every subsequent gyro operation _______, with no alarm and no DSKY indication."
+          }
+        ]
+      },
+      {
+        "title": "The Four Coffman Conditions",
+        "minutes": 20,
+        "overview": "Deadlock requires all four conditions to hold simultaneously. Preventing any one prevents deadlock. The AGC bug is a degenerate case: no circular chain, just an abandoned lock — showing circular wait is sufficient but not necessary.",
+        "points": [
+          "Mutual exclusion: the resource can be held by at most one process at a time.",
+          "Hold and wait: a process holds a resource while waiting for another.",
+          "No preemption: resources cannot be forcibly taken; only voluntarily released.",
+          "Circular wait: a chain of processes each waiting for a resource held by the next."
+        ],
+        "talkingPoints": [
+          "Stress the degenerate circular-wait case. Many students treat circular wait as the defining condition — the AGC shows you can reach permanent blocking without it.",
+          "Ask: which condition would be cheapest to eliminate? Mutual exclusion is often necessary. No-preemption and hold-and-wait are the usual targets.",
+          "Breaking hold-and-wait: require processes to acquire all resources at once, or release-all-before-request. Tradeoffs: reduced concurrency, harder to program.",
+          "Global lock ordering breaks circular wait by convention — not enforced by the runtime, but tools like ThreadSanitizer can detect violations."
+        ],
+        "table": {
+          "headers": ["Condition", "Definition", "AGC Mapping"],
+          "rows": [
+            ["Mutual Exclusion", "Resource held by at most one process at a time.", "LGYRO is a single-owner lock — only one routine can torque gyros."],
+            ["Hold and Wait", "Process holds a resource while waiting for another.", "The cage error path exits while LGYRO is still held. Holder is gone but lock persists."],
+            ["No Preemption", "Resources cannot be forcibly taken; only voluntarily released.", "Nothing in the AGC runtime forcibly clears LGYRO. The Executive does not know it is orphaned."],
+            ["Circular Wait", "Chain of processes each waiting for a resource held by the next.", "Degenerate case: no circular chain. The holder simply vanished. Circular wait is sufficient but not necessary."]
+          ]
+        },
+        "blanks": [
+          {
+            "cue": "All four required",
+            "template": "Deadlock requires _______ conditions to hold simultaneously. Preventing any _______ prevents deadlock."
+          },
+          {
+            "cue": "Circular wait",
+            "template": "Circular wait is sufficient but not _______  — an abandoned lock produces the same outcome without a circular chain."
+          }
+        ]
+      },
+      {
+        "title": "Deadlock Strategies",
+        "minutes": 20,
+        "overview": "Systems take one of four approaches to deadlock. The right choice depends on whether the cost of prevention or detection exceeds the cost of occasional failures.",
+        "points": [
+          "Prevention: structurally eliminate at least one Coffman condition at design time.",
+          "Avoidance: allow dynamic requests but only grant if the resulting state remains safe (Banker's Algorithm).",
+          "Detection + Recovery: allow deadlocks to occur; detect via cycle detection; recover by killing or preempting.",
+          "Ostrich: assume deadlocks are rare enough that the cost of prevention or detection exceeds the cost of reboots."
+        ],
+        "talkingPoints": [
+          "Global lock ordering is the most practical prevention technique. It is a convention — not enforced by the runtime — but ThreadSanitizer can catch violations.",
+          "Banker's Algorithm requires knowing max resource needs in advance — impractical for most real systems. Useful theoretically; rarely deployed in production OS kernels.",
+          "Most real-world systems use detection + recovery for database locks. MySQL kills the transaction with the smallest rollback cost.",
+          "Collins had no detection. The DSKY accepted commands silently. Detection failure is often worse than the deadlock itself.",
+          "Linux and Windows do not prevent or detect all deadlocks — they accept occasional hangs as acceptable cost. Not an option if you are Michael Collins behind the Moon."
+        ],
+        "callouts": [
+          {
+            "label": "ASK",
+            "text": "Which strategy does your OS use? Which does a database like MySQL use? Are they the same?"
+          }
+        ],
+        "table": {
+          "headers": ["Strategy", "Mechanism", "Tradeoff / When Used"],
+          "rows": [
+            ["Prevention", "Eliminate >= 1 Coffman condition at design time", "Safest but restrictive. Global lock ordering is the most practical form."],
+            ["Avoidance", "Banker's Algorithm — only grant if state stays safe", "Requires known max needs upfront. Theoretical; rarely used in production kernels."],
+            ["Detection + Recovery", "Allow deadlock; detect cycles; kill or preempt", "Practical for databases. MySQL deadlock detector is a real example."],
+            ["Ostrich", "Ignore it; reboot when it happens", "Default for most desktop OS kernels. Acceptable when deadlocks are rare and cost is low."]
+          ]
+        },
+        "blanks": [
+          {
+            "cue": "Four strategies",
+            "template": "The four deadlock strategies are: prevention, _______, detection + recovery, and _______."
+          },
+          {
+            "cue": "Banker's limit",
+            "template": "Avoidance requires knowing _______ resource needs in advance, which is impractical for most real systems."
+          }
+        ]
+      },
+      {
+        "title": "Lock Discipline and Language Evolution",
+        "minutes": 15,
+        "overview": "The AGC bug is a lock leak: resource acquired but not released on an error path (CWE-772). The root cause is that correct behavior is enforced by programmer convention rather than language structure. Modern languages have progressively moved this obligation from programmer to compiler.",
+        "points": [
+          "AGC / C: sem_post() and release are manual — programmer forgets one exit path, leak is silent.",
+          "Java / Python: try { ... } finally { lock.release() } — programmer must remember to write the finally block.",
+          "C++ RAII: std::lock_guard<std::mutex> — lock released when guard goes out of scope; hard to forget.",
+          "Rust: MutexGuard via ownership system — lock leak is a compile-time error; cannot be forgotten."
+        ],
+        "talkingPoints": [
+          "POSIX pthread_mutex_lock / sem_wait are manual, exactly like the AGC. If a thread holding a mutex dies without releasing, the mutex is abandoned — same failure mode, 55 years later.",
+          "RAII: tie resource lifetime to object scope. When the lock_guard is destroyed (scope exit, return, exception), the destructor releases the lock. No separate release call needed.",
+          "Rust ownership: the MutexGuard is the lock. When it goes out of scope, the lock is released. You cannot hold a MutexGuard across a thread boundary that would orphan it. The compiler enforces this.",
+          "Ask: why do lock leaks still appear in CVE databases if Rust exists? Most production systems are not written in Rust. Database connection pools, distributed locks, shell scripts — still the programmer's problem.",
+          "For your C assignments: you are writing in the AGC era. sem_post is manual. The compiler will not save you. Test your error paths explicitly."
+        ],
+        "callouts": [
+          {
+            "label": "KEY",
+            "text": "For your C assignments: you are in the AGC era. sem_post is manual. Test every error path — the compiler will not save you."
+          }
+        ],
+        "table": {
+          "headers": ["Era / Language", "Mechanism", "Failure Mode"],
+          "rows": [
+            ["AGC / C (1969+)", "sem_post() / manual release", "Programmer forgets one exit path. Leak is silent."],
+            ["Java / Python (1990s+)", "try { ... } finally { lock.release() }", "Programmer must remember to write the finally block."],
+            ["C++ RAII (2000s+)", "std::lock_guard<std::mutex>", "Lock released when guard goes out of scope. Hard to forget."],
+            ["Rust (2015+)", "MutexGuard via ownership system", "Lock leak is a compile-time error. Cannot be forgotten."]
+          ]
+        },
+        "blanks": [
+          {
+            "cue": "Lock leak",
+            "template": "A lock leak (CWE-772) occurs when a resource is _______ but never _______ on an error path."
+          },
+          {
+            "cue": "RAII",
+            "template": "C++ RAII ties resource lifetime to _______ scope — the destructor releases the lock automatically on any exit."
+          }
+        ]
+      }
+    ]
+  }
+}
