@@ -24,25 +24,23 @@ async function generate(config, options) {
   config.lecture.sections.forEach((section, index) => {
     const slide = deck.addSlide();
     addChrome(slide, section.title, `Section ${index + 1}`);
-    addPanel(slide, "Overview", section.overview || "Use this slide to anchor the section before expanding details.", 0.8, 1.4, 5.3, 2.1);
-    addPanel(
-      slide,
-      "Teaching points",
-      (section.points || []).map((item) => `• ${item}`).join("\n"),
-      6.3,
-      1.4,
-      5.7,
-      2.8,
-    );
-    addPanel(
-      slide,
-      "Discussion / activity",
-      (section.activities || section.discussionQuestions || ["Prompt students to defend the tradeoff on this slide."]).map((item) => `• ${item}`).join("\n"),
-      0.8,
-      3.9,
-      11.2,
-      2.4,
-    );
+
+    // Overview as italic subtitle text under the chrome bar
+    const overviewText = section.overview || "Use this slide to anchor the section before expanding details.";
+    slide.addText(overviewText, {
+      x: 0.8,
+      y: 1.15,
+      w: 11.7,
+      h: 0.5,
+      color: "94A3B8",
+      fontSize: 14,
+      italic: true,
+      valign: "middle",
+    });
+
+    // Key points — full-width bullet list, capped at 4
+    const points = (section.points || []).slice(0, 4);
+    addBulletList(slide, points, { y: 1.8, h: 5.2 });
   });
 
   const closing = deck.addSlide();
