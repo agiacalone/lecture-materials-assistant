@@ -1,6 +1,14 @@
+"use strict";
+
+const fs = require("fs");
 const path = require("path");
 const { topicSlug } = require("../lib/context");
-const { heading, paragraph, writeDocx } = require("../lib/docx-helpers");
+const {
+  compileLatex,
+  texDocHeader,
+  texEscape,
+  texPreamble,
+} = require("../lib/tex-helpers");
 
 function deriveQuestions(config) {
   if (Array.isArray(config.lecture.studyQuestions) && config.lecture.studyQuestions.length > 0) {
@@ -8,7 +16,7 @@ function deriveQuestions(config) {
   }
 
   const concepts = config.lecture.keyConcepts;
-  const sections = config.lecture.sections.map((section) => section.title);
+  const sections = config.lecture.sections.map((s) => s.title);
   const questions = [
     `[Recall] Define ${concepts[0]}.`,
     `[Recall] Summarize the main idea behind ${concepts[1] || concepts[0]}.`,
@@ -29,22 +37,44 @@ function deriveQuestions(config) {
   return questions;
 }
 
-async function generate(config, options) {
+function generate(config, options) {
   const slug = topicSlug(config);
-  const filePath = path.join(options.outputDir, `${slug}_study_questions.docx`);
-  const children = [
-    paragraph(config.lecture.summary),
-    paragraph("These questions reinforce the lecture and the guided notes. They should deepen recall and transfer, not reproduce the missing slide content for students who did not attend."),
-  ];
+  const texPath = path.join(options.outputDir, `${slug}_study_questions.tex`);
+  const { course, lecture } = config;
+  const courseLabel = `${course.code} \u2014 ${course.name}`;
+  const allQuestions = deriveQuestions(config);
 
-  children.push(heading("Study Questions"));
-  deriveQuestions(config).forEach((question, index) => {
-    children.push(paragraph(`Q${index + 1}. ${question}`));
-    children.push(paragraph("Answer: ________________________________________________", { color: "666666" }));
-  });
+  const recallQs  = allQuestions.filter((q) => q.startsWith("[Recall]"));
+  const applyQs   = allQuestions.filter((q) => q.startsWith("[Apply]"));
+  const analyzeQs = allQuestions.filter((q) => q.startsWith("[Analyze]"));
 
-  await writeDocx(filePath, children, { title: `STUDY QUESTIONS - ${config.lecture.topic}` });
-  return filePath;
+  const lines = [];
+  lines.push(texPreamble(lecture.topic, courseLabel));
+  lines.push("\\begin{document}");
+  lines.push("\\thispagestyle{fancy}");
+  lines.push(texDocHeader(lecture.topic, "Study Questions", courseLabel));
+  lines.push(`\\noindent\\textit{${texEscape("These questions reinforce the lecture and guided notes. They should deepen recall and transfer \u2014 not a substitute for attending.")}}\n`);
+
+  let qNum = 1;
+
+  function renderGroup(title, qs, vspace) {
+    lines.push(`\n{\\color{instrNavy}\\large\\textbf{${texEscape(title)}}}`);
+    lines.push(`{\\color{instrNavy}\\rule{\\linewidth}{0.4pt}}\n`);
+    qs.forEach((q) => {
+      const text = q.replace(/^\[.*?\]\s*/, "");
+      lines.push(`\\noindent\\textbf{Q${qNum++}.} ${texEscape(text)}\n`);
+      lines.push(`\\vspace{${vspace}}\n`);
+    });
+  }
+
+  renderGroup("Recall", recallQs, "2em");
+  renderGroup("Apply", applyQs, "3em");
+  renderGroup("Analyze", analyzeQs, "4em");
+
+  lines.push("\\end{document}\n");
+
+  fs.writeFileSync(texPath, lines.join("\n"));
+  return compileLatex(texPath, options.outputDir);
 }
 
 module.exports = { generate };
