@@ -91,6 +91,17 @@ The intended mental model is:
 The skill is not the generator itself. The checked-in `.js` toolchain is the
 generator; the skill is how Claude maps requests into that toolchain consistently.
 
+## Current Note
+
+The end-to-end workflow has been exercised successfully with the `Virtual Memory and
+Paging` example:
+- freeform prompt -> spec JSON
+- spec JSON -> compiled `.docx`, `.md`, and `.pptx` outputs
+
+Current limitation: the prompt parser still needs refinement. It produces usable
+specs, but some extracted fields and generated phrasing still need cleanup before
+the outputs should be considered production-ready without review.
+
 Scripts use `docx` v9+ and `pptxgenjs` v4+. Exams also require a LaTeX toolchain
 with `pdflatex` available on `PATH`.
 

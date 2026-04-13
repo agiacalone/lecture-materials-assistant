@@ -7,6 +7,18 @@ This repo now contains the stable JavaScript generators directly. In a course re
 Claude should gather topic and content, write or update a lecture spec JSON, and use
 the checked-in generator scripts to produce the lecture materials.
 
+## Current Status
+
+The end-to-end workflow is working:
+- freeform or structured request -> lecture spec JSON
+- lecture spec JSON -> compiled lecture documents
+
+It has been exercised successfully with a `Virtual Memory and Paging` example.
+
+Current limitation: the prompt parser still needs refinement. It produces usable
+specs, but some extracted fields and generated phrasing still need cleanup before
+the outputs should be treated as production-ready without review.
+
 ## What It Generates
 
 | Artifact | Format | Description |
