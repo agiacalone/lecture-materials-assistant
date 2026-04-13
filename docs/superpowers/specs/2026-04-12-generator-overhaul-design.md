@@ -76,17 +76,68 @@ trees, no nested constructors.
 `texPreamble(title, course, options)` — emits `\documentclass[12pt]{article}`, package imports,
 color definitions, and custom environments.
 
-**Colors** (matching existing docx scheme):
-- `navyblue` → `#1F3864`
-- `csblue` → `#2E5FA3`
-- `amberlight` → `#FFF8E7`
-- `analysisbg` → `#EAF2FB`
-- `practicebg` → `#F0FAF0`
-- `referencebg` → `#E5E7EB`
+### Color Philosophy
 
-**Custom environments** (defined once in preamble):
-- `talkingpoints` — shaded box, bold `[TALKING POINTS]` header, bullet list
-- `hookblock` — distinct shaded box for the opening hook callout
+Two distinct palettes serve two distinct jobs.
+
+**Instructor lecture notes — fast-glance optimized:**
+
+The instructor is standing at the front of the room under pressure. The document must be
+locatable by color pattern, not by reading. Each content type gets a strongly saturated,
+semantically distinct color. Colors are more saturated than they appear on screen to compensate
+for print washout (printed colors run ~20–30% less vivid).
+
+| Element | Background | Text | Semantic signal |
+|---|---|---|---|
+| Section banner | Navy `#1F3864` | White | Structural skeleton — anchors position on page |
+| Hook block | Teal `#0D9488` | White | "Start here" — distinct warm-cool contrast |
+| `[TALKING POINTS]` | Amber `#D97706` | White | What to say — warm, high-saturation, eye-catching |
+| KEY callout badge | Navy `#1F3864` | White | Definitional anchor |
+| KEY callout body | `#DBEAFE` | Navy | — |
+| ASK callout badge | Indigo `#4F46E5` | White | Discussion prompt |
+| ASK callout body | `#EEF2FF` | Indigo | — |
+| DEMO callout badge | Green `#15803D` | White | "Go" — live demo or activity |
+| DEMO callout body | `#DCFCE7` | Green | — |
+| THESIS callout badge | Orange `#C2410C` | White | Central argument — alert tone |
+| THESIS callout body | `#FFEDD5` | Dark orange | — |
+| Regular content | White | Black | Colored blocks stand out against white |
+
+Traffic signal logic: **Amber = instructor voice** (talking points), **Teal/Green = action**
+(hook, demo), **Navy/Indigo = structural or definitional**, **Orange = high-importance anchor**.
+
+**Student Cornell handout — accessible, not fast-glance:**
+
+The student is seated, reading at their own pace, filling in blanks. Accessibility (WCAG AA
+contrast, colorblind-safe choices, no red/green combinations) matters more than instant
+visual differentiation. Colors are subdued and functional.
+
+| Element | Background | Text | Purpose |
+|---|---|---|---|
+| Section banner | Medium blue `#2563EB` | White | Clear section structure |
+| Cue column | Light blue-gray `#F1F5F9` | Navy `#1F3864` | Subtle, readable label area |
+| Fill-in cell | Yellow `#FEF9C3` | Black | Universal "fill this in" convention |
+| Scaffolded text cell | White | Dark gray `#374151` | Not a blank — pre-filled context |
+| Summary strip | Light blue `#EFF6FF` | Navy | Calm, distinct from body |
+| Table header row | Medium blue `#2563EB` | White | Matches section banner |
+
+**Colors defined in `tex-helpers.js` preamble** (instructor palette):
+- `instrNavy` → `#1F3864`
+- `instrTeal` → `#0D9488`
+- `instrAmber` → `#D97706`
+- `instrIndigo` → `#4F46E5`
+- `instrGreen` → `#15803D`
+- `instrOrange` → `#C2410C`
+- Supporting tints as above
+
+**Colors defined in `docx-helpers.js`** (student handout palette):
+- `handoutBlue` → `#2563EB`
+- `handoutCueBg` → `#F1F5F9`
+- `handoutFillIn` → `#FEF9C3`
+- `handoutSummary` → `#EFF6FF`
+
+**Custom environments** (instructor LaTeX preamble only):
+- `talkingpoints` — amber background box, bold `[TALKING POINTS]` header, bullet list
+- `hookblock` — teal background box for the opening hook callout
 - `calloutenv` — two-column minipage: badge label left, content right
 
 ### Helper Functions
