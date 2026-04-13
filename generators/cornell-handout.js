@@ -1,136 +1,280 @@
+"use strict";
+
+const fs = require("fs");
 const path = require("path");
+const {
+  AlignmentType,
+  BorderStyle,
+  Document,
+  Footer,
+  Header,
+  Packer,
+  PageNumber,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  TextRun,
+  WidthType,
+} = require("docx");
 const { topicSlug } = require("../lib/context");
-const { bullet, paragraph, sectionBanner, summaryBox, twoColumnNotes, writeDocx } = require("../lib/docx-helpers");
 
-function sectionAnchorRows(section) {
-  const rows = [];
+// Student handout palette — accessible, WCAG AA, not fast-glance
+const H = {
+  bannerBg:     "2563EB",  // Medium blue
+  bannerText:   "FFFFFF",
+  cueBg:        "F1F5F9",  // Light blue-gray
+  cueText:      "1F3864",  // Navy
+  fillIn:       "FEF9C3",  // Yellow — universal fill-in convention
+  scaffoldText: "374151",  // Dark gray
+  summaryBg:    "EFF6FF",  // Light blue
+};
 
-  rows.push({
-    cue: `${section.title} anchor`,
-    notes: section.cornellPrompt || `${section.title}: capture the anchor claim from the projected slide. Keep the high-value definition or conclusion for in-class completion.`,
-    cueFill: "2E5FA3",
-    cueColor: "FFFFFF",
-    notesFill: "EBF3FB",
+const ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV"];
+
+function para(text, opts = {}) {
+  return new Paragraph({
+    spacing: { after: opts.after === undefined ? 60 : opts.after },
+    bullet: opts.bullet ? { level: 0 } : undefined,
+    children: [
+      new TextRun({
+        text: String(text),
+        font: "Arial",
+        size: opts.size || 20,
+        bold: Boolean(opts.bold),
+        italics: Boolean(opts.italics),
+        color: opts.color || "000000",
+      }),
+    ],
+  });
+}
+
+function sectionBanner(title, index) {
+  const roman = ROMAN[index] || String(index + 1);
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            shading: { fill: H.bannerBg },
+            children: [
+              new Paragraph({
+                spacing: { after: 0 },
+                children: [
+                  new TextRun({
+                    text: `${roman}. ${title}`,
+                    bold: true,
+                    color: H.bannerText,
+                    font: "Arial",
+                    size: 24,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+function cornellTable(rows) {
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: rows.map(({ cue, notes, fillIn }) =>
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 28, type: WidthType.PERCENTAGE },
+            shading: { fill: H.cueBg },
+            children: [para(cue, { bold: true, color: H.cueText, after: 0 })],
+          }),
+          new TableCell({
+            width: { size: 72, type: WidthType.PERCENTAGE },
+            shading: fillIn ? { fill: H.fillIn } : undefined,
+            borders: {
+              left: { style: BorderStyle.SINGLE, size: 16, color: H.bannerBg },
+            },
+            children: [para(notes, { color: fillIn ? "000000" : H.scaffoldText, after: 0 })],
+          }),
+        ],
+      }),
+    ),
+  });
+}
+
+function comparisonTable(tableSpec) {
+  const { headers, rows } = tableSpec;
+  const colPct = Math.floor(100 / headers.length);
+
+  const headerRow = new TableRow({
+    children: headers.map((h) =>
+      new TableCell({
+        width: { size: colPct, type: WidthType.PERCENTAGE },
+        shading: { fill: H.bannerBg },
+        children: [para(h, { bold: true, color: H.bannerText, after: 0 })],
+      }),
+    ),
   });
 
-  if (section.overview) {
-    rows.push({
-      cue: "Why it matters",
-      notes: `${section.overview} Key conclusion: _______.`,
-    });
-  }
+  const dataRows = rows.map((row) =>
+    new TableRow({
+      children: row.map((cell) => {
+        const isFillIn = cell === "" || cell.includes("_______");
+        return new TableCell({
+          width: { size: colPct, type: WidthType.PERCENTAGE },
+          shading: isFillIn ? { fill: H.fillIn } : undefined,
+          children: [para(isFillIn ? "_______________" : cell, { color: "000000", after: 0 })],
+        });
+      }),
+    }),
+  );
 
-  (section.points || []).slice(0, 3).forEach((point, index) => {
-    rows.push({
-      cue: `Point ${index + 1}`,
-      notes: `${point.replace(/\.$/, "")}: _______.`,
-    });
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [headerRow, ...dataRows],
   });
+}
 
-  (section.blanks || []).forEach((blank) => {
-    rows.push({
-      cue: blank.cue,
-      notes: blank.template,
-    });
+function summaryStrip() {
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            shading: { fill: H.summaryBg },
+            children: [
+              para("Summary \u2014 write this after class in your own words", { bold: true, color: H.cueText, size: 22, after: 120 }),
+              para("\u00a0", { after: 280 }),
+              para("\u00a0", { after: 280 }),
+              para("\u00a0", { after: 120 }),
+            ],
+          }),
+        ],
+      }),
+    ],
   });
-
-  return rows;
-}
-
-function buildOpeningRows(config) {
-  return [
-    {
-      cue: "Opening hook",
-      notes: `${config.lecture.openingHook || `Why does ${config.lecture.topic} matter in practice?`} Key setup: _______.`,
-      cueFill: "2E5FA3",
-      cueColor: "FFFFFF",
-      notesFill: "EBF3FB",
-    },
-  ];
-}
-
-function buildFrameworkRows(config) {
-  return (config.lecture.keyConcepts || []).map((concept, index) => ({
-    cue: `Concept ${index + 1}`,
-    notes: `${concept}: _______.`,
-  }));
-}
-
-function buildBulletRows(items, cuePrefix, promptFactory) {
-  return (items || []).map((item, index) => ({
-    cue: `${cuePrefix} ${index + 1}`,
-    notes: promptFactory(item),
-  }));
-}
-
-function buildSummaryPrompts(topic, sections) {
-  const first = sections[0] ? sections[0].title : topic;
-  const last = sections[sections.length - 1] ? sections[sections.length - 1].title : topic;
-  return [
-    `Big idea: ${topic} matters because ________________________________.`,
-    `Most important move from ${first}: ________________________________.`,
-    `Connection to ${last}: ___________________________________________.`,
-  ];
-}
-
-function buildTakeawayPrompts(items) {
-  return (items || []).slice(0, 3).map((item, index) => `Takeaway ${index + 1}: ${item.replace(/\.$/, "")} -> _______.`);
 }
 
 async function generate(config, options) {
   const slug = topicSlug(config);
   const filePath = path.join(options.outputDir, `${slug}_cornell_handout.docx`);
+  const { lecture } = config;
   const children = [];
-  const lecture = config.lecture;
 
-  children.push(paragraph("Pre-distributed guided notes. This handout follows the lecture in order and captures only anchor content. Students fill omitted key elements from projected slides during lecture."));
+  // Title
+  children.push(
+    new Paragraph({
+      spacing: { after: 80 },
+      children: [
+        new TextRun({ text: lecture.topic, bold: true, font: "Arial", size: 36, color: H.cueText }),
+      ],
+    }),
+  );
 
-  children.push(sectionBanner("Opening Hook", "takeaway"));
-  children.push(twoColumnNotes(buildOpeningRows(config)));
+  // Instruction text
+  children.push(
+    new Paragraph({
+      spacing: { after: 160 },
+      children: [
+        new TextRun({
+          text: "Fill in the highlighted cells and blank lines during lecture. Complete the Summary strip afterward.",
+          font: "Arial",
+          size: 20,
+          italics: true,
+          color: H.scaffoldText,
+        }),
+      ],
+    }),
+  );
 
-  children.push(sectionBanner("Framework", "structure"));
-  children.push(twoColumnNotes(buildFrameworkRows(config)));
+  // One section per lecture section
+  lecture.sections.forEach((section, index) => {
+    children.push(sectionBanner(section.title, index));
 
-  children.push(sectionBanner("Taxonomy / Concepts", "structure"));
-  lecture.sections.forEach((section) => {
-    children.push(sectionBanner(`${section.title} (${section.minutes || "TBD"} min)`, "concept"));
-    children.push(twoColumnNotes(sectionAnchorRows(section)));
+    if (section.table && section.table.headers && section.table.rows) {
+      children.push(comparisonTable(section.table));
+    } else {
+      const rows = [];
+
+      // Blank rows (fill-in, yellow)
+      (section.blanks || []).forEach((blank) => {
+        rows.push({ cue: blank.cue, notes: blank.template, fillIn: true });
+      });
+
+      // Key points with scaffolded text (not fill-in)
+      (section.points || []).slice(0, 3).forEach((point, i) => {
+        rows.push({ cue: `Point ${i + 1}`, notes: `${point.replace(/\.$/, "")}: _______.`, fillIn: false });
+      });
+
+      // Overview as non-fill-in context row if table is sparse
+      if (section.overview && rows.length < 2) {
+        rows.push({ cue: "Overview", notes: section.overview, fillIn: false });
+      }
+
+      if (rows.length > 0) {
+        children.push(cornellTable(rows));
+      }
+    }
   });
 
-  children.push(summaryBox("Page Summary", buildSummaryPrompts(lecture.topic, lecture.sections)));
-
-  if ((lecture.caseStudies || []).length > 0) {
-    children.push(sectionBanner("Case Studies", "analysis"));
-    children.push(twoColumnNotes(buildBulletRows(lecture.caseStudies, "Case", (item) => `${item}: evidence from lecture -> _______.`)));
+  // References
+  if (lecture.references && lecture.references.length > 0) {
+    children.push(para("References", { bold: true, color: H.cueText, size: 22, after: 60 }));
+    lecture.references.forEach((ref) => {
+      children.push(para(ref, { bullet: true, color: H.scaffoldText, size: 18, after: 60 }));
+    });
   }
 
-  if ((lecture.activities || []).length > 0) {
-    children.push(sectionBanner("Activities", "practice"));
-    children.push(twoColumnNotes(buildBulletRows(lecture.activities, "Activity", (item) => `${item}: result / decision -> _______.`)));
-  }
+  // Summary strip always at bottom
+  children.push(summaryStrip());
 
-  children.push(sectionBanner("Defense / Takeaways", "takeaway"));
-  children.push(twoColumnNotes(buildBulletRows(lecture.takeaways || lecture.objectives, "Takeaway", (item) => `${item.replace(/\.$/, "")}: _______.`)));
-
-  if ((lecture.discussionQuestions || []).length > 0) {
-    children.push(sectionBanner("Discussion Questions", "concept"));
-    children.push(twoColumnNotes(buildBulletRows(lecture.discussionQuestions, "Question", (item) => `${item} Notes: ________________________________________________`)));
-  }
-
-  children.push(summaryBox("End-of-Lecture Summary", buildTakeawayPrompts(lecture.takeaways || lecture.objectives)));
-
-  children.push(sectionBanner("Vocabulary", "concept"));
-  (lecture.vocabulary || lecture.keyConcepts).forEach((term) => {
-    const text = typeof term === "string" ? `${term}: _______` : `${term.term}: ${term.definitionBlank || "_______"}`;
-    children.push(bullet(text));
+  const doc = new Document({
+    creator: "lecture-materials-assistant",
+    title: `CORNELL HANDOUT - ${lecture.topic}`,
+    sections: [
+      {
+        headers: {
+          default: new Header({
+            children: [
+              new Paragraph({
+                spacing: { after: 60 },
+                children: [
+                  new TextRun({
+                    text: `${lecture.topic} \u2014 Cornell Handout`,
+                    bold: true,
+                    font: "Arial",
+                    size: 20,
+                    color: H.cueText,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        },
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({ text: "Fill in during lecture  |  Page ", font: "Arial", size: 18 }),
+                  PageNumber.CURRENT,
+                ],
+              }),
+            ],
+          }),
+        },
+        children,
+      },
+    ],
   });
 
-  children.push(sectionBanner("Self-Quiz", "takeaway"));
-  (lecture.selfQuiz || lecture.discussionQuestions || []).slice(0, 4).forEach((question) => {
-    children.push(bullet(question));
-  });
-
-  await writeDocx(filePath, children, { title: `CORNELL HANDOUT - ${lecture.topic}` });
+  const buffer = await Packer.toBuffer(doc);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, buffer);
   return filePath;
 }
 
