@@ -32,7 +32,10 @@ function deriveQuestions(config) {
 async function generate(config, options) {
   const slug = topicSlug(config);
   const filePath = path.join(options.outputDir, `${slug}_study_questions.docx`);
-  const children = [paragraph(config.lecture.summary)];
+  const children = [
+    paragraph(config.lecture.summary),
+    paragraph("These questions reinforce the lecture and the guided notes. They should deepen recall and transfer, not reproduce the missing slide content for students who did not attend."),
+  ];
 
   children.push(heading("Study Questions"));
   deriveQuestions(config).forEach((question, index) => {

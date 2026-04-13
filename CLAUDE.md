@@ -8,6 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 CS lecture materials. The checked-in Node.js code is the stable generator. The skill
 is the interface layer that turns a user request into a structured lecture spec and
 then runs that generator. It should not regenerate JavaScript files on each run.
+Student-facing lecture materials are intentionally partial replacements for
+distributing slides: target roughly 40% of slide content and omit key explanatory
+elements so students must attend lecture.
+Printed student handouts and instructor lecture notes should use color
+intentionally so the materials are easy to navigate at a glance during lecture.
 
 ## Skill Invocation
 
@@ -61,8 +66,8 @@ structural reference, but exam output is produced through the checked-in
 | File | Format | Key constraints |
 |------|--------|-----------------|
 | `[topic]_lecture_notes.docx` | Lecture notes | Arial, navy/blue headers, 8 callout types |
-| `[topic]_cornell_handout.docx` | Student handout | 2-col layout, ~40% blank density, blank audit required |
-| `[topic]_study_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze |
+| `[topic]_cornell_handout.docx` | Student handout | 2-col layout, ~40% slide-content coverage, strategic omissions, blank audit required |
+| `[topic]_study_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze; reinforce lecture without recreating slides |
 | `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
 | `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
 | `[course_num]-exam-[n]-[term].pdf` | Exam | Assembled from bank(s), compiled to PDF via pdflatex; `.tex` source retained alongside; generator toggles `\answerstrue` and recompiles for the key |
@@ -124,7 +129,8 @@ pdftoppm -jpeg -r 150 [topic]_slides.pdf slide
 
 ## Critical Style Rules (enforced by style-guide.md)
 
-- **Cornell handout**: Pre-distributed via Canvas before class. Students fill blanks from projected slides during lecture — blanks must map to a specific slide (cite in audit). Verbal explanation is never a blank source; it is scaffolded text in the handout and assessed through short answer questions. Key diagrams/frameworks from slides must appear in the handout as partial structures. Note-sharing is an accepted outcome — the short answer assessments are the comprehension gate, not the blanks.
+- **Cornell handout**: Pre-distributed via Canvas before class. Students fill blanks from projected slides during lecture — blanks must map to a specific slide (cite in audit). Verbal explanation is never a blank source; it is scaffolded text in the handout and assessed through short answer questions. Keep student-facing coverage to roughly 40% of the slide content and omit key labels, examples, and conclusions so the handout does not recreate the deck. Key diagrams/frameworks from slides must appear in the handout as partial structures.
+- **Printed `.docx` materials**: Use color as a functional lecture cue. Handouts and instructor notes should preserve colored headers, cue regions, dividers, and callout fills so the printed pages are easy to scan instantly in the middle of a live lecture.
 - **Slides**: Theme colors are slate `#0F172A`, indigo `#6366F1`, amber `#F59E0B`. Every content slide needs an indigo stripe and section badge.
 - **Study questions**: Open-ended and case-study reference questions are always required. Attacker-mindset question required only when `adversarial-thinking: yes` (Security courses). Defaults to `no`.
 - **Pop quiz**: All questions must come from slide/lecture content — no curveballs. MC distractors must be plausible. Answer key is a separate page with red header; include grading rubric notes per question. Do not reuse study question wording verbatim.

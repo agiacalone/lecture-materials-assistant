@@ -1,7 +1,7 @@
 ---
 name: lecture-materials-assistant
 description: >
-  Generates complete lecture material sets for CS professors: lecture notes (.docx),
+  Generates lecture material sets for CS professors: lecture notes (.docx),
   Cornell note-taking handouts (.docx), study questions (.docx), pop quizzes (.docx),
   GitHub Classroom README assignments (.md), topic-wide question banks (.md),
   assembled exams (.tex/.pdf), and slide decks (.pptx). Use this skill whenever a
@@ -16,8 +16,12 @@ description: >
 
 # Lecture Materials Assistant
 
-Generates styled, production-ready lecture materials for CS courses. All artifacts
-follow a strict style guide. See `references/style-guide.md` for complete specs.
+Generates styled, production-ready lecture materials for CS courses. Student-facing
+lecture materials are intentionally partial: they replace distributing slides, but
+should expose only about 40% of slide content so attendance is still required. All
+artifacts follow a strict style guide. See `references/style-guide.md` for complete specs.
+Printed student handouts and instructor lecture notes should use color
+intentionally as a live navigation aid that reads clearly at a glance during lecture.
 
 **Read `references/style-guide.md` before generating any artifact.**
 
@@ -52,9 +56,9 @@ block on that field alone.
 
 | Artifact | File | When |
 |---|---|---|
-| Lecture notes | `[topic]_lecture_notes.docx` | Full instructor copy with speaker notes, timing, callouts |
-| Cornell handout | `[topic]_cornell_handout.docx` | 2-page student sheet with strategic blanks |
-| Study questions | `[topic]_study_questions.docx` | 10 tiered questions for out-of-class review |
+| Lecture notes | `[topic]_lecture_notes.docx` | Instructor copy with speaker notes, timing, and callouts; not student-facing |
+| Cornell handout | `[topic]_cornell_handout.docx` | Student guided notes with roughly 40% slide coverage and strategic omissions |
+| Study questions | `[topic]_study_questions.docx` | 10 tiered review questions that reinforce the lecture without recreating it |
 | Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
 | Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |
 | Exam | `[course_num]-exam-[n]-[term].pdf` | Assembled from bank(s), compiled via pdflatex; `.tex` source retained; generator toggles `\answerstrue` and recompiles for the key |
@@ -217,6 +221,8 @@ rules. In particular, check it for:
 
 - lecture-note callout types and section order
 - Cornell blank density, blank audit, and diagram rules
+- student-facing coverage limits and omission requirements
+- printed color usage for handouts and instructor notes
 - study-question tier counts and required question variety
 - quiz timing, answer-key format, and question constraints
 - question-bank schema, numbering, dedupe, and tagging

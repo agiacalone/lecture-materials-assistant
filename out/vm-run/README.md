@@ -1,11 +1,11 @@
 # Virtual Memory and Paging
 
-Cover virtual address space, page table translation, TLB locality, page faults.
+Introduce the motivation for virtual memory, explain page translation, and connect paging tradeoffs to performance and protection.
 
 ## Learning Goals
-- Explain the core idea behind Virtual Memory and Paging.
-- Apply virtual address space to a practical computing scenario.
-- Evaluate the main tradeoffs and failure modes around Virtual Memory and Paging.
+- Explain why virtual memory exists and what problems it solves.
+- Trace address translation through the page table and TLB.
+- Evaluate paging tradeoffs involving locality, overhead, and protection.
 
 ## Deliverables
 - Working implementation or notes artifact
@@ -13,10 +13,10 @@ Cover virtual address space, page table translation, TLB locality, page faults.
 - Evidence that requirements were verified
 
 ## Requirements
-- virtual address space
-- page table translation
+- Virtual address space
+- Page table translation
 - TLB locality
-- page faults
+- Page faults and replacement
 
 ## Please note
 - Submit work that you can explain and defend.

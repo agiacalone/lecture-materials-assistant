@@ -4,6 +4,72 @@ Full style specifications for all artifact types.
 
 ---
 
+## Student-Facing Coverage Policy
+
+Student-facing lecture materials are a replacement for distributing the slide deck,
+not a substitute for attending lecture. They should expose roughly **40% of the
+slide material**: anchor vocabulary, section structure, and a limited set of
+guiding prompts.
+
+The remaining ~60% should stay attendance-dependent. Omit or partially omit the
+elements that carry the lecture's real explanatory value:
+- complete definitions and full worked examples
+- final labels in diagrams, state transitions, and tables
+- key comparison criteria, tradeoff conclusions, and synthesis statements
+- solution steps, filled-in formulas, and end-state takeaways
+
+Design student-facing artifacts so a student who skips class cannot reconstruct the
+full lecture from the handout alone. They should leave with a usable scaffold, but
+they must attend to capture the missing explanations and key elements.
+
+Artifacts that follow this policy directly:
+- Cornell handout
+- any student-facing lecture notes or guided notes
+- in-class review sheets tied to the lecture
+
+Artifacts that may be more complete because they are not slide replacements:
+- instructor lecture notes
+- quizzes, exams, and question banks
+- instructor-facing README or assignment drafting materials
+
+## Printed Color Policy
+
+Student handouts and instructor lecture notes are printed teaching materials. Use
+color intentionally so instructors and students can locate structure quickly in the
+middle of a live public lecture.
+
+Color in printed `.docx` artifacts is functional, not decorative:
+- section headers should visibly segment the page
+- cue columns, badges, and callouts should be distinguishable at a glance
+- prompts, definitions, warnings, and takeaways should use consistent color families
+- diagrams and partial structures should preserve enough color contrast to orient the page during live teaching
+
+The color system should remain readable from normal lectern distance. An instructor
+should be able to glance down and immediately identify where they are on the page.
+
+Do not flatten lecture notes or handouts into grayscale-first layouts unless the
+user explicitly asks for a monochrome print mode. Assume normal course printing can
+preserve light fills and dark accents well enough to serve as lecture cues.
+
+## Symbols Policy
+
+Symbols may be used in printed `.docx` materials to add clarity, but they are
+secondary to text labels and color. Use them sparingly as redundant cues, not as a
+third visual system competing for attention.
+
+Appropriate uses:
+- a small symbol prefix on section banners
+- a simple symbol prefix on callout badges
+
+Avoid:
+- decorative icon clutter
+- using symbols without text labels
+- introducing many symbols that users must memorize
+
+Printed materials should still be understandable if a reader ignores the symbols.
+
+---
+
 ## Code and Pseudocode (all artifacts)
 
 ### Inline Code
@@ -115,10 +181,13 @@ actor. Highlight the current step in amber `F59E0B`.
 - **Page size:** US Letter, 1" margins
 - **Header:** "LECTURE NOTES — [Topic]" with blue bottom border
 - **Footer:** "Instructor Copy — Not for Distribution" + page X of Y
+- **Color usage:** Required. Printed instructor notes should use color to mark section transitions, callout types, and table structure so the instructor can navigate the document quickly while teaching and find the right region at a glance.
 
 ### Callout Boxes
 
 2-column table: colored left badge (label) + tinted right cell (content).
+Badges may include one simple symbol prefix for faster scanning, but the text label
+remains mandatory.
 
 | Badge | Background | Use |
 |---|---|---|
@@ -160,14 +229,19 @@ explanation beyond the slides — this is not blanked out, but assessed separate
 short answer questions.
 
 This creates a deliberate two-layer system:
-- **Blanks** → answered from projected slides; confirm attendance; shareable notes are an accepted outcome
-- **Short answer assessments** → test comprehension of verbal explanation; cannot be answered from blanks alone
+- **Partial guided notes** → expose only anchor content from projected slides; confirm attendance by withholding key labels, examples, and conclusions
+- **Short answer assessments** → test comprehension of verbal explanation; cannot be answered from the guided notes alone
 
 Students do not receive a personal copy of the slides. The completed handout
-(blanks filled from slides + scaffolded context) serves as their study document.
-Key frameworks and diagrams from slides must be represented in the handout as
-partial structures so students can orient themselves during lecture and have a
-complete reference afterward.
+(blanks filled from slides + scaffolded context) serves as a partial study scaffold,
+not a complete lecture record. Key frameworks and diagrams from slides must be
+represented in the handout as partial structures so students can orient themselves
+during lecture without receiving a full slide replacement afterward.
+
+Color is required in the printed handout. Use it to make the page legible in real
+time: students should be able to identify cue areas, note-taking space, section
+breaks, and summary boxes immediately during lecture, and the instructor should be
+able to spot those same regions instantly while presenting.
 
 ### Layout
 
@@ -175,6 +249,9 @@ complete reference afterward.
 - **Left cue column:** 2880 DXA (~2"), blue `F0F4FA` background, bold navy cue keywords
 - **Right notes column:** 6480 DXA (~4.5"), white background, content + blanks
 - **Vertical divider:** solid blue `2E5FA3`, 8pt weight
+
+Keep these colors visible in print. The cue column and divider are part of the live
+navigation system for the handout, not optional decoration.
 
 ### Blank Types (mix deliberately)
 
@@ -185,9 +262,11 @@ complete reference afterward.
 | Open line with italic hint | `*Key concept* _______` |
 | Synthesis bullets | `Key lesson: _______` |
 
-**Blank density:** ~40% blank / 60% scaffolded by default.
-- More scaffolded → intro topics or weaker students
-- More open → advanced topics or strong students
+**Coverage target:** student-facing handouts should carry roughly 40% of the slide
+material by content, not just by blank count.
+- Keep the visible content to section anchors, cue phrases, and minimal context
+- Omit the highest-value explanatory moves so lecture attendance is still required
+- Use blanks and partial diagrams as the main omission mechanism
 
 ### Diagrams and Visual Content
 
@@ -218,6 +297,8 @@ Key terms with blank definitions.
 
 Every blank must be answerable from a projected slide during class. This is the
 attendance mechanism — students fill blanks by watching the lecture, not by guessing.
+The audit should also confirm that the handout does not expose enough detail to
+reconstruct the full slide sequence without attending.
 
 | Blank type | Required source |
 |---|---|

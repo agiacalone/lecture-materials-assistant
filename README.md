@@ -3,6 +3,12 @@
 A [Claude Code](https://claude.ai/code) skill and reusable generator toolchain for
 production-ready lecture materials for university CS courses.
 
+Student-facing lecture materials are intentionally partial replacements for
+distributing slides. They should carry roughly 40% of slide content and omit key
+elements so students still need to attend lecture.
+Printed student handouts and instructor lecture notes should also use color
+intentionally so both documents are easy to navigate at a glance during a live lecture.
+
 This repo now contains the stable JavaScript generators directly. In a course repo,
 Claude should gather topic and content, write or update a lecture spec JSON, and use
 the checked-in generator scripts to produce the lecture materials.
@@ -24,8 +30,8 @@ the outputs should be treated as production-ready without review.
 | Artifact | Format | Description |
 |---|---|---|
 | Lecture notes | `.docx` | Instructor copy with speaker notes, timing, and callout boxes |
-| Cornell handout | `.docx` | Pre-distributed guided notes; students fill blanks from projected slides |
-| Study questions | `.docx` | 10 tiered questions (Recall / Apply / Analyze) |
+| Cornell handout | `.docx` | Pre-distributed guided notes with roughly 40% slide coverage; students fill omitted key elements from projected slides |
+| Study questions | `.docx` | 10 tiered questions (Recall / Apply / Analyze) that reinforce lecture rather than restate slides |
 | Pop quiz | `.docx` | 5-question in-class quiz with instructor answer key |
 | Slide deck | `.pptx` | 14–18 slides, CS Modern dark slate theme |
 | GitHub README | `.md` | GitHub Classroom assignment (reading or lab variant) |
