@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-**lecture-materials-assistant** is a Claude Code skill that generates production-ready lecture materials for CS courses. It has no build system or runtime — its "code" is the skill definition and style guide that Claude reads to generate Node.js scripts on demand.
+**lecture-materials-assistant** is a Claude Code skill and reusable Node.js
+generator toolchain for production-ready lecture materials for CS courses. The
+skill should use the checked-in scripts in this repo rather than regenerating
+JavaScript files on each run.
 
 ## Skill Invocation
 
@@ -14,7 +17,9 @@ Users invoke the skill from a course project directory that has a `CLAUDE.md` re
 - Use the lecture materials assistant skill at ~/.claude/skills/lecture-materials-assistant/SKILL.md
 ```
 
-When deployed as a skill, the entry point is `SKILL.md`. When invoked, Claude must read `references/style-guide.md` before generating any artifact — this is mandatory, not optional.
+When deployed as a skill, the entry point is `SKILL.md`. When invoked, Claude must
+read `references/style-guide.md` before generating any artifact, then use the
+existing CLI in this repo to compile outputs from a lecture spec.
 
 ## Architecture
 
@@ -22,6 +27,11 @@ When deployed as a skill, the entry point is `SKILL.md`. When invoked, Claude mu
 lecture-materials-assistant/
 ├── SKILL.md                       # Skill metadata, workflow, artifact specs, file naming
 ├── CLAUDE.md.example              # Template users copy to their course project directory
+├── generate.js                    # Stable CLI entrypoint
+├── examples/
+│   └── lecture-spec.json          # Sample structured lecture input
+├── generators/                    # Reusable artifact generators
+├── lib/                           # Shared helpers for docx/pptx/text generation
 ├── references/
 │   ├── style-guide.md             # Complete style specs — MUST read before generating
 │   └── reference_exam.tex         # Structural reference for LaTeX exam generation
@@ -31,23 +41,17 @@ lecture-materials-assistant/
 **Generation flow:**
 1. User specifies topic + 5 course context fields (course code, student level, lecture length, assessment format, adversarial-thinking)
 2. Claude reads `SKILL.md` + `style-guide.md`
-3. Claude writes a modular Node.js script structure in the user's working directory:
-   - `lib/palette.js` — shared color constants
-   - `lib/docx-helpers.js` — shared docx construction helpers (re-exports `docx` constructors)
-   - `lib/pptx-helpers.js` — `createSlideHelpers(pptx, total, course, topic)` factory
-   - `lib/bank-helpers.js` — question-bank parsing, dedupe, and numbering helpers
-   - `lib/exam-helpers.js` — exam assembly, weighting, shuffle, and compile helpers
-   - `generators/lecture-notes.js`, `generators/cornell-handout.js`, `generators/study-questions.js`, `generators/quiz.js`, `generators/slides.js`, `generators/readme.js`, `generators/question-bank.js`, `generators/exam.js` — one per artifact family, each independently runnable
-   - `generate.js` — CLI orchestrator for the standard lecture set: `node generate.js [--all|--notes|--cornell|--questions|--quiz|--slides|--readme]`
+3. Claude writes or updates a lecture spec JSON in the user's working directory
 4. User runs:
-   - `node generate.js` for the standard six-artifact lecture set
-   - `node generate.js --slides` for one lecture artifact
-   - `node generators/question-bank.js` for a topic-wide bank
-   - `node generators/exam.js` for exam assembly and PDF compilation
+   - `node init-spec.js --topic "..." ...` to scaffold a spec when starting from scratch
+   - `node generate.js --config /path/to/lecture-spec.json`
+   - `node generate.js --config /path/to/lecture-spec.json --artifact slides`
+   - `node generate.js --config /path/to/lecture-spec.json --artifact bank`
+   - `node generate.js --config /path/to/lecture-spec.json --artifact exam`
 
-For exam generation, Claude still reads `references/reference_exam.tex` as a structural
-reference, but exam output is produced through `generators/exam.js`, which writes the
-`.tex` file and invokes `pdflatex`.
+For exam generation, Claude still reads `references/reference_exam.tex` as a
+structural reference, but exam output is produced through the checked-in
+`generators/exam.js`.
 
 ## Output Artifacts
 
@@ -65,8 +69,16 @@ reference, but exam output is produced through `generators/exam.js`, which write
 ## Required npm/pip Dependencies (user installs once)
 
 ```bash
-npm install docx pptxgenjs markdown-it
+npm install
 ```
+
+## Preferred Skill Behavior
+
+When the user gives a lecture request in natural language, Claude should:
+1. Extract the topic, course context, key concepts, sections, case studies, and questions.
+2. Create or update a lecture spec JSON, using `init-spec.js` for a first scaffold when useful.
+3. Refine that JSON to satisfy `references/style-guide.md`.
+4. Run `generate.js` against the final spec.
 
 Scripts use `docx` v9+ and `pptxgenjs` v4+. Exams also require a LaTeX toolchain
 with `pdflatex` available on `PATH`.

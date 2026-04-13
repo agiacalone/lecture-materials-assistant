@@ -1,10 +1,11 @@
 # lecture-materials-assistant
 
-A [Claude Code](https://claude.ai/code) skill for generating production-ready lecture materials for university CS courses.
+A [Claude Code](https://claude.ai/code) skill and reusable generator toolchain for
+production-ready lecture materials for university CS courses.
 
-This repo is the skill definition and reference material. In a course repo, Claude
-uses it to generate JavaScript-based artifact generators, which then produce the
-lecture materials.
+This repo now contains the stable JavaScript generators directly. In a course repo,
+Claude should gather topic and content, write or update a lecture spec JSON, and use
+the checked-in generator scripts to produce the lecture materials.
 
 ## What It Generates
 
@@ -120,7 +121,13 @@ Fill in the five course context fields in `CLAUDE.md`.
 
 ## Dependencies
 
-In each course repo where you generate materials, install the JS dependencies:
+Install the JS dependencies once in this repo:
+
+```bash
+npm install
+```
+
+Manual equivalent:
 
 ```bash
 npm install docx pptxgenjs
@@ -148,24 +155,47 @@ Typical flow:
 
 1. Put the skill on Claude's path and reference it from your course repo's `CLAUDE.md`.
 2. Provide course context once.
-3. Ask Claude to generate a lecture set, a question bank, or an exam.
-4. Run the generated JS entrypoint(s) in your course repo.
+3. Ask Claude to generate or update a lecture spec JSON from your topic and content.
+4. Run the checked-in generator CLI with that spec.
+
+### Scaffolding a lecture spec
+
+You do not need to start from raw JSON. Use the included scaffold command:
+
+```bash
+node init-spec.js --prompt "Generate lecture materials for Virtual Memory and Paging in CECS 326 Operating Systems. Student level: upper-division CS majors. ~75 minutes. Cover: virtual address space, page table translation, TLB locality, page faults. Sections: Why virtual memory exists|Page translation and the TLB|Page faults and thrashing. Case studies: single-level page table overhead|thrashing under poor locality. Questions: When is a larger page size a net win?|How should an OS respond to thrashing?"
+```
+
+Or use explicit flags:
+
+```bash
+node init-spec.js \
+  --topic "Virtual Memory and Paging" \
+  --course-code "CECS 326" \
+  --course-name "Operating Systems" \
+  --student-level "Upper-division CS majors with systems background" \
+  --minutes 75 \
+  --concepts "virtual address space|page table translation|TLB locality|page faults" \
+  --sections "Why virtual memory exists|Page translation and the TLB|Page faults and thrashing" \
+  --questions "When is a larger page size a net win?|How should an OS respond to thrashing?"
+```
+
+That produces a starter spec JSON which Claude can then refine before generation.
 
 ### Generating lecture materials
 
 > Generate lecture materials for [TOPIC] in [COURSE]. Cover: [KEY CONCEPTS]. Case studies: [EXAMPLES]. ~[N] minutes.
 
-The skill generates JavaScript-based artifact generators in your working directory.
-Those generators then produce the lecture materials.
+The skill should not regenerate JavaScript source on each run. It should use the
+existing generator code in this repo and feed it a structured config file.
 
 ```
 generate.js              # CLI orchestrator for the standard lecture set
+examples/
+  lecture-spec.json      # sample lecture input
 lib/
-  palette.js
   docx-helpers.js
   pptx-helpers.js
-  bank-helpers.js
-  exam-helpers.js
 generators/
   lecture-notes.js
   cornell-handout.js
@@ -177,13 +207,12 @@ generators/
   exam.js
 ```
 
-Run the standard lecture set at once, or regenerate a single artifact:
+Run the standard lecture set at once, or generate a single artifact:
 
 ```bash
-node generate.js                      # standard six-artifact lecture set
-node generate.js --slides             # slides only
-node generate.js --cornell            # Cornell handout only
-node generators/slides.js             # same, standalone
+node generate.js --config examples/lecture-spec.json
+node generate.js --config examples/lecture-spec.json --artifact slides
+node generate.js --config examples/lecture-spec.json --artifact cornell
 ```
 
 ### Generating a question bank
@@ -194,7 +223,7 @@ Question banks are topic-wide and append-only. Claude should read the existing b
 first, avoid duplicates, and assign the next sequence number per question type.
 
 ```bash
-node generators/question-bank.js
+node generate.js --config examples/lecture-spec.json --artifact bank
 ```
 
 ### Assembling an exam
@@ -206,11 +235,13 @@ needed, writes `[course_num]-exam-[n]-[term].tex`, compiles the student PDF, the
 toggles `\answerstrue` and recompiles to produce the key PDF.
 
 ```bash
-node generators/exam.js
+node generate.js --config examples/lecture-spec.json --artifact exam
 ```
 
 ## References
 
+- `examples/lecture-spec.json` — sample structured lecture input
+- `init-spec.js` — scaffold a lecture spec from prompt-like inputs
 - `references/style-guide.md` — complete style specifications for all artifacts
 - `references/reference_exam.tex` — structural LaTeX template for exam generation
 

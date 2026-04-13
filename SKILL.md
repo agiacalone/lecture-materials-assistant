@@ -96,10 +96,13 @@ file names are distinct (e.g. `326-exam-1-sp26-a.tex`, `326-exam-1-sp26-b.tex`).
 ## Generation Process
 
 Generate files in the current working directory unless the user specifies a target
-folder. For Claude Code, implement artifact generation through reusable Node.js
-scripts written in the working directory. This applies to the standard lecture set,
-topic-wide question banks, and exam assembly. The scripts are the generation system;
-the generated lecture materials are outputs of those scripts.
+folder. For Claude Code, use the existing reusable Node.js scripts in this repo.
+Do not regenerate the JavaScript toolchain on each run. Instead:
+
+1. Read `references/style-guide.md`
+2. Gather or update the lecture spec JSON with the topic, course context, and content
+3. Use `init-spec.js` to scaffold the spec when starting from a prompt and no spec exists yet
+4. Run the checked-in generator CLI against that spec
 
 **Dependencies** (install once per course repo, as needed):
 ```bash
@@ -112,16 +115,16 @@ For exams, ensure a LaTeX toolchain is available:
 pdflatex --version
 ```
 
-**Suggested script structure (modular — one file per artifact family):**
+**Existing script structure (modular — one file per artifact family):**
 
 ```
+init-spec.js             # scaffold a lecture spec from prompt-like inputs
 generate.js              # CLI orchestrator for the standard lecture set
+examples/
+  lecture-spec.json      # sample lecture input
 lib/
-  palette.js             # shared color constants (docx + pptx)
   docx-helpers.js        # shared docx construction helpers
-  pptx-helpers.js        # createSlideHelpers() factory
-  bank-helpers.js        # question-bank parsing / dedupe / numbering
-  exam-helpers.js        # exam assembly / weighting / shuffle helpers
+  pptx-helpers.js        # slide helpers
 generators/
   lecture-notes.js       # → [topic]_lecture_notes.docx
   cornell-handout.js     # → [topic]_cornell_handout.docx
@@ -136,15 +139,33 @@ generators/
 **Execution model:**
 - Standard single-session lecture set: lecture notes, Cornell handout, study questions, quiz, README, and slides
 - Topic-wide bank generation: create or append to `[topic]_question_bank.md`
-- Exam assembly: read 2–3 bank files, generate `.tex`, compile the student PDF, then toggle `\answerstrue` and recompile the key PDF
+- Exam assembly: read the exam section of the config, generate `.tex`, and optionally compile it downstream
 
 **Running (examples):**
 ```bash
-node generate.js                      # standard six-artifact lecture set
-node generate.js --slides             # one artifact only
-node generators/question-bank.js      # topic-wide bank
-node generators/exam.js               # assembled exam
+node init-spec.js --prompt "Generate lecture materials for Virtual Memory and Paging in CECS 326. Cover: virtual address space, page table translation, TLB locality."
+node init-spec.js --topic "Virtual Memory and Paging" --course-code "CECS 326"
+node generate.js --config examples/lecture-spec.json
+node generate.js --config examples/lecture-spec.json --artifact slides
+node generate.js --config examples/lecture-spec.json --artifact bank
+node generate.js --config examples/lecture-spec.json --artifact exam
 ```
+
+## Prompt-To-Spec Translation
+
+When the user asks for lecture materials from a topic and some content, translate the
+request into the lecture spec JSON rather than writing generator code.
+
+- Topic line maps to `lecture.topic`
+- Course context maps to `course.*`
+- Covered concepts map to `lecture.keyConcepts`
+- Requested agenda or subtopics map to `lecture.sections`
+- Examples or case studies map to `lecture.caseStudies`
+- In-class exercises map to `lecture.activities`
+- Review prompts or homework questions map to `lecture.discussionQuestions`
+
+If a user request is incomplete, scaffold the spec with the best available defaults,
+then fill gaps conservatively instead of regenerating new `.js` files.
 
 **Packages:**
 - `.docx` → `docx` npm package (v9+)
@@ -152,10 +173,10 @@ node generators/exam.js               # assembled exam
 - `.md` question bank / README → plain text or Markdown helpers as needed
 - `.tex` / `.pdf` exam → LaTeX toolchain (`pdflatex`)
 
-When updating existing materials, read the current artifact first and preserve its
-scope, numbering, and file naming unless the user asks for a restructure. For
-question banks, never overwrite an existing bank: append only after checking for
-duplicates and assigning the next sequence number per type.
+When updating existing materials, update the lecture spec first and preserve scope,
+numbering, and file naming unless the user asks for a restructure. For question
+banks, never overwrite an existing bank blindly: read it first, then append or
+merge intentionally.
 
 **QA workflow for slides (run manually — Claude Code has no in-chat image display):**
 ```bash

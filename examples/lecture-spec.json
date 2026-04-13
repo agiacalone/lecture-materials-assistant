@@ -1,0 +1,143 @@
+{
+  "course": {
+    "code": "CECS 326",
+    "name": "Operating Systems",
+    "studentLevel": "Upper-division CS majors with systems programming experience",
+    "lectureLengthMinutes": 75,
+    "assessmentFormat": "GitHub Classroom lab and in-class activities",
+    "adversarialThinking": false
+  },
+  "lecture": {
+    "topic": "Virtual Memory and Paging",
+    "summary": "Introduce the motivation for virtual memory, explain page translation, and connect paging tradeoffs to performance and protection.",
+    "openingHook": "Start with a process that appears to own a large contiguous address space even though physical memory is fragmented and shared.",
+    "objectives": [
+      "Explain why virtual memory exists and what problems it solves.",
+      "Trace address translation through the page table and TLB.",
+      "Evaluate paging tradeoffs involving locality, overhead, and protection."
+    ],
+    "keyConcepts": [
+      "Virtual address space",
+      "Page table translation",
+      "TLB locality",
+      "Page faults and replacement"
+    ],
+    "caseStudies": [
+      "Single-level page table overhead on 32-bit systems",
+      "TLB misses during a memory-intensive workload",
+      "Thrashing under poor locality"
+    ],
+    "activities": [
+      "Walk through one address translation by hand.",
+      "Ask students to predict whether a workload will improve or destroy locality."
+    ],
+    "takeaways": [
+      "Paging is an illusion layer that trades space and translation overhead for flexibility and protection.",
+      "The TLB matters because the page table is too expensive to consult for every access.",
+      "Locality is the difference between a practical VM system and a collapsing one."
+    ],
+    "discussionQuestions": [
+      "When is a larger page size a net win?",
+      "How should an OS respond when a process begins to thrash?",
+      "Which part of paging is most visible to an application developer?"
+    ],
+    "references": [
+      "Operating Systems: Three Easy Pieces, virtualization chapters",
+      "Architecture notes on TLB structure and page walks"
+    ],
+    "vocabulary": [
+      "page",
+      "frame",
+      "TLB",
+      "page fault"
+    ],
+    "sections": [
+      {
+        "title": "Why Virtual Memory Exists",
+        "minutes": 15,
+        "overview": "Frame the abstraction: each process sees a clean private address space while the OS manages sharing and fragmentation underneath.",
+        "points": [
+          "Isolation and protection are easier with per-process virtual address spaces.",
+          "Physical memory allocation is too constrained to expose directly to user processes.",
+          "The abstraction allows programs to be written without knowing physical placement."
+        ],
+        "callouts": [
+          {
+            "label": "KEY",
+            "text": "Virtual memory is not just a capacity trick; it is a protection and management mechanism.",
+            "tint": "FFF8E7"
+          }
+        ],
+        "speakerNotes": [
+          "Use a fragmented RAM diagram and contrast it with the clean process view."
+        ],
+        "blanks": [
+          {
+            "cue": "Core abstraction",
+            "template": "Each process sees a private _______ address space while the OS maps it onto physical memory."
+          }
+        ]
+      },
+      {
+        "title": "Page Translation and the TLB",
+        "minutes": 30,
+        "overview": "Break down address translation, page table lookup, and why TLB locality determines whether paging is cheap or painful.",
+        "points": [
+          "A virtual address splits into page number and offset.",
+          "The TLB caches recent translations to avoid repeated page table walks.",
+          "TLB misses amplify the real cost of memory references."
+        ],
+        "activities": [
+          "Translate one sample address using a small page table."
+        ],
+        "blanks": [
+          {
+            "cue": "Address format",
+            "template": "Virtual address = page number + _______."
+          },
+          {
+            "cue": "TLB role",
+            "template": "The TLB caches recent page-table _______."
+          }
+        ]
+      },
+      {
+        "title": "Page Faults, Replacement, and Thrashing",
+        "minutes": 20,
+        "overview": "Connect VM policy decisions to runtime behavior by showing page faults, replacement pressure, and collapse under poor locality.",
+        "points": [
+          "A page fault transfers control to the OS when the needed page is absent.",
+          "Replacement policy tries to keep the working set resident.",
+          "Thrashing happens when the fault rate is high enough that useful progress stalls."
+        ],
+        "activities": [
+          "Have students classify workloads as locality-friendly or locality-hostile."
+        ],
+        "blanks": [
+          {
+            "cue": "Failure mode",
+            "template": "When the working set does not fit and the fault rate explodes, the system begins _______."
+          }
+        ]
+      }
+    ]
+  },
+  "exam": {
+    "name": "Exam 2",
+    "fileBase": "326-exam-2-sp26",
+    "totalPoints": 20,
+    "includeAnswerKey": false,
+    "questions": [
+      {
+        "prompt": "Trace a virtual address through the paging system and explain where a TLB hit changes the cost profile.",
+        "points": 10,
+        "answer": "A strong answer identifies VPN, offset, TLB lookup, page-table fallback, and resulting physical address."
+      },
+      {
+        "prompt": "Explain why thrashing occurs and name one mitigation the OS can apply.",
+        "points": 10,
+        "answer": "A strong answer connects working-set pressure to excessive page faults and proposes a defensible mitigation."
+      }
+    ]
+  }
+}
