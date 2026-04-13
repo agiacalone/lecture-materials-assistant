@@ -1,56 +1,97 @@
+"use strict";
+
+const fs = require("fs");
 const path = require("path");
 const { topicSlug } = require("../lib/context");
-const { bullet, callout, heading, labelValue, paragraph, sectionBanner, writeDocx } = require("../lib/docx-helpers");
+const {
+  compileLatex,
+  texBulletList,
+  texCallout,
+  texComparisonTable,
+  texDocHeader,
+  texHook,
+  texPlainSection,
+  texPreamble,
+  texSectionRule,
+  texTalkingPoints,
+  texEscape,
+} = require("../lib/tex-helpers");
 
 async function generate(config, options) {
   const slug = topicSlug(config);
-  const filePath = path.join(options.outputDir, `${slug}_lecture_notes.docx`);
-  const children = [];
+  const texPath = path.join(options.outputDir, `${slug}_lecture_notes.tex`);
   const { course, lecture } = config;
+  const courseLabel = `${course.code} \u2014 ${course.name}`;
 
-  children.push(paragraph(lecture.summary));
-  children.push(labelValue("Course", `${course.code} - ${course.name}`));
-  children.push(labelValue("Student level", course.studentLevel));
-  children.push(labelValue("Lecture length", `${course.lectureLengthMinutes} minutes`));
-  children.push(labelValue("Assessment format", course.assessmentFormat));
+  const lines = [];
+  lines.push(texPreamble(lecture.topic, courseLabel));
+  lines.push("\\begin{document}");
+  lines.push("\\thispagestyle{fancy}");
+  lines.push(texDocHeader(lecture.topic, "Lecture Notes \u2014 with Talking Points", courseLabel));
 
-  children.push(sectionBanner("Learning Objectives", "concept"));
-  lecture.objectives.forEach((objective) => children.push(bullet(objective)));
+  // Opening hook
+  lines.push(texHook(
+    lecture.openingHook ||
+    `Frame ${lecture.topic} as a practical systems problem before introducing formal vocabulary.`
+  ));
 
-  children.push(sectionBanner("Opening Hook", "takeaway"));
-  children.push(paragraph(lecture.openingHook || `Frame ${lecture.topic} as a practical systems problem before introducing formal vocabulary.`));
+  // Learning objectives
+  lines.push(texPlainSection("Learning Objectives"));
+  lines.push(texBulletList(lecture.objectives));
 
-  children.push(sectionBanner("Framework", "structure"));
-  lecture.keyConcepts.forEach((concept) => children.push(bullet(concept)));
+  // Numbered sections
+  lecture.sections.forEach((section, index) => {
+    lines.push(texSectionRule(`${section.title} (${section.minutes || "TBD"} min)`, index));
 
-  children.push(sectionBanner("Taxonomy / Concepts", "structure"));
-  lecture.sections.forEach((section) => {
-    children.push(heading(`${section.title} (${section.minutes || "TBD"} min)`, { size: 24 }));
     if (section.overview) {
-      children.push(paragraph(section.overview));
+      lines.push(`\\noindent ${texEscape(section.overview)}\n`);
     }
-    (section.points || []).forEach((point) => children.push(bullet(point)));
-    (section.callouts || []).forEach((item) => children.push(callout(item.label, item.text, item.tint)));
-    (section.speakerNotes || []).forEach((note) => children.push(paragraph(`Speaker note: ${note}`, { italics: true, color: "555555" })));
+
+    if (section.points && section.points.length > 0) {
+      lines.push(texBulletList(section.points));
+    }
+
+    const talkingPoints = section.talkingPoints || section.speakerNotes;
+    if (talkingPoints && talkingPoints.length > 0) {
+      lines.push(texTalkingPoints(talkingPoints));
+    }
+
+    (section.callouts || []).forEach((c) => {
+      lines.push(texCallout(c.label, c.text));
+    });
+
+    if (section.table) {
+      lines.push(texComparisonTable(section.table.headers, section.table.rows));
+    }
   });
 
-  children.push(sectionBanner("Case Studies", "analysis"));
-  (lecture.caseStudies || []).forEach((item) => children.push(bullet(item)));
+  // Case studies
+  if (lecture.caseStudies && lecture.caseStudies.length > 0) {
+    lines.push(texPlainSection("Case Studies"));
+    lines.push(texBulletList(lecture.caseStudies));
+  }
 
-  children.push(sectionBanner("Activities", "practice"));
-  (lecture.activities || []).forEach((item) => children.push(bullet(item)));
+  // Summary
+  lines.push(texPlainSection("Summary"));
+  lines.push(texBulletList(lecture.takeaways || lecture.objectives));
 
-  children.push(sectionBanner("Defense / Takeaways", "takeaway"));
-  (lecture.takeaways || lecture.objectives).forEach((item) => children.push(bullet(item)));
+  // Discussion questions
+  if (lecture.discussionQuestions && lecture.discussionQuestions.length > 0) {
+    lines.push(texPlainSection("Discussion Questions"));
+    lines.push(texBulletList(lecture.discussionQuestions));
+  }
 
-  children.push(sectionBanner("Discussion Questions", "concept"));
-  (lecture.discussionQuestions || []).forEach((item) => children.push(bullet(item)));
+  // References
+  if (lecture.references && lecture.references.length > 0) {
+    lines.push(texPlainSection("References"));
+    lines.push(texBulletList(lecture.references));
+  }
 
-  children.push(sectionBanner("References", "reference"));
-  (lecture.references || []).forEach((item) => children.push(bullet(item)));
+  lines.push("\\end{document}\n");
 
-  await writeDocx(filePath, children, { title: `LECTURE NOTES - ${lecture.topic}` });
-  return filePath;
+  fs.writeFileSync(texPath, lines.join("\n"));
+  const pdfPath = compileLatex(texPath, options.outputDir);
+  return pdfPath;
 }
 
 module.exports = { generate };
