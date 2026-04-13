@@ -17,11 +17,14 @@ function deriveQuestions(config) {
 
   const concepts = config.lecture.keyConcepts;
   const sections = config.lecture.sections.map((s) => s.title);
+  const c0 = concepts[0] || "the primary concept";
+  const c1 = concepts[1] || c0;
+  const s0 = sections[0] || "the first section";
   const questions = [
-    `[Recall] Define ${concepts[0]}.`,
-    `[Recall] Summarize the main idea behind ${concepts[1] || concepts[0]}.`,
-    `[Apply] Apply ${concepts[0]} to one of today’s case studies.`,
-    `[Apply] Explain how ${sections[0]} would change under a different workload or constraint.`,
+    `[Recall] Define ${c0}.`,
+    `[Recall] Summarize the main idea behind ${c1}.`,
+    `[Apply] Apply ${c0} to one of today’s case studies.`,
+    `[Apply] Explain how ${s0} would change under a different workload or constraint.`,
     `[Apply] Choose one tradeoff from the lecture and defend a decision.`,
     `[Analyze] Compare two approaches from the lecture and identify the stronger fit for a real system.`,
     `[Analyze] Identify the failure mode most likely to appear if the lecture’s guardrails are ignored.`,
