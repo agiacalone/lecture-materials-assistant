@@ -17,7 +17,7 @@ const {
   texEscape,
 } = require("../lib/tex-helpers");
 
-async function generate(config, options) {
+function generate(config, options) {
   const slug = topicSlug(config);
   const texPath = path.join(options.outputDir, `${slug}_lecture_notes.tex`);
   const { course, lecture } = config;
@@ -57,10 +57,12 @@ async function generate(config, options) {
     }
 
     (section.callouts || []).forEach((c) => {
-      lines.push(texCallout(c.label, c.text));
+      if (c && c.text) {
+        lines.push(texCallout(c.label, c.text));
+      }
     });
 
-    if (section.table) {
+    if (section.table && section.table.headers && section.table.rows) {
       lines.push(texComparisonTable(section.table.headers, section.table.rows));
     }
   });
