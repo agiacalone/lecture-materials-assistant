@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-**lecture-materials-assistant** is a Claude Code skill and reusable Node.js
-generator toolchain for production-ready lecture materials for CS courses. The
-skill should use the checked-in scripts in this repo rather than regenerating
-JavaScript files on each run.
+**lecture-materials-assistant** is a document-generation system for production-ready
+CS lecture materials. The checked-in Node.js code is the stable generator. The skill
+is the interface layer that turns a user request into a structured lecture spec and
+then runs that generator. It should not regenerate JavaScript files on each run.
 
 ## Skill Invocation
 
@@ -18,8 +18,8 @@ Users invoke the skill from a course project directory that has a `CLAUDE.md` re
 ```
 
 When deployed as a skill, the entry point is `SKILL.md`. When invoked, Claude must
-read `references/style-guide.md` before generating any artifact, then use the
-existing CLI in this repo to compile outputs from a lecture spec.
+read `references/style-guide.md`, translate the user's request into a lecture spec
+JSON, and use the existing CLI in this repo to compile outputs from that spec.
 
 ## Architecture
 
@@ -39,15 +39,18 @@ lecture-materials-assistant/
 ```
 
 **Generation flow:**
-1. User specifies topic + 5 course context fields (course code, student level, lecture length, assessment format, adversarial-thinking)
-2. Claude reads `SKILL.md` + `style-guide.md`
-3. Claude writes or updates a lecture spec JSON in the user's working directory
-4. User runs:
-   - `node init-spec.js --topic "..." ...` to scaffold a spec when starting from scratch
-   - `node generate.js --config /path/to/lecture-spec.json`
-   - `node generate.js --config /path/to/lecture-spec.json --artifact slides`
-   - `node generate.js --config /path/to/lecture-spec.json --artifact bank`
-   - `node generate.js --config /path/to/lecture-spec.json --artifact exam`
+1. The user provides a structured or semi-structured lecture request.
+2. Claude reads `SKILL.md` + `references/style-guide.md`.
+3. Claude creates or updates a lecture spec JSON in the user's working directory.
+4. Claude runs the stable generator against that spec.
+
+**CLI entrypoints:**
+- `node init-spec.js --prompt "..."` to scaffold a spec from a freeform request
+- `node init-spec.js --topic "..." ...` to scaffold a spec from explicit flags
+- `node generate.js --config /path/to/lecture-spec.json`
+- `node generate.js --config /path/to/lecture-spec.json --artifact slides`
+- `node generate.js --config /path/to/lecture-spec.json --artifact bank`
+- `node generate.js --config /path/to/lecture-spec.json --artifact exam`
 
 For exam generation, Claude still reads `references/reference_exam.tex` as a
 structural reference, but exam output is produced through the checked-in
@@ -79,6 +82,14 @@ When the user gives a lecture request in natural language, Claude should:
 2. Create or update a lecture spec JSON, using `init-spec.js` for a first scaffold when useful.
 3. Refine that JSON to satisfy `references/style-guide.md`.
 4. Run `generate.js` against the final spec.
+
+The intended mental model is:
+- Input: a lecture request
+- Intermediate representation: a lecture spec JSON
+- Output: compiled lecture documents
+
+The skill is not the generator itself. The checked-in `.js` toolchain is the
+generator; the skill is how Claude maps requests into that toolchain consistently.
 
 Scripts use `docx` v9+ and `pptxgenjs` v4+. Exams also require a LaTeX toolchain
 with `pdflatex` available on `PATH`.
