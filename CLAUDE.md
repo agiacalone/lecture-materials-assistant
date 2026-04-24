@@ -14,6 +14,50 @@ elements so students must attend lecture.
 Printed student handouts and instructor lecture notes should use color
 intentionally so the materials are easy to navigate at a glance during lecture.
 
+## Living Notes — What is Kept vs What is Disposable
+
+This skill builds a **living-notes** system around the generated materials. Every
+artifact is produced fresh each semester from the spec + the latest priors, but
+the formats split into two tiers:
+
+- **Kept (canonical, lives in the vault):** open, diffable, queryable text formats
+  — Markdown for prose (`notes-md`, `cornell-md`, `quiz-md`, `study-questions`,
+  `readme`), Markdown or CSV for tabular data (`question-bank`), JSON for structured
+  intake (`spec.json`). These accumulate across semesters. Anthony edits them in
+  the vault, adds notes in the margins, cross-links them into work-journals. When
+  planning the next semester's version, he reads the kept form first — it IS the
+  prior.
+- **Disposable (regenerated fresh each semester):** the print/display artifacts
+  that students actually receive — `.pdf` (instructor notes, quiz + key, exam),
+  `.docx` (Cornell handout, study questions in printable form), `.pptx` (slide
+  deck). Hand these out, throw away the old ones, regenerate when the content
+  updates.
+
+**Practical cycle:**
+1. Read the kept `.md` artifacts from last semester to recall what changed and
+   what to update.
+2. Update `spec.json` with new stats, new case studies, corrections.
+3. Run `generate.js --all` — overwrites both kept and disposable outputs from
+   the refreshed spec.
+4. Diff the regenerated `.md` against last semester's (the vault is the prior)
+   to validate updates propagated. Copy to `<vault>/classes/<course>/` if
+   not already there.
+5. Print / distribute the disposables.
+
+**Preferred formats by artifact type:**
+
+| Data shape | Preferred kept format |
+|---|---|
+| Narrative prose (lecture notes, handouts, quizzes) | Markdown |
+| Tabular data (question banks, grade rubrics) | Markdown table or CSV (prefer CSV when column count is large or sort/filter matters) |
+| Structured intake / config | JSON |
+| Assembled assessments | regenerated `.pdf` — the kept form is the bank + exam spec |
+
+Never add a "kept" format in a proprietary or tool-specific binary — the
+principle is open, easy-to-track, tool-agnostic text. The disposables can be
+whatever the lecture-day target audience needs (`.pdf` for print, `.pptx` for
+projector, `.docx` for editing on iPad).
+
 ## Skill Invocation
 
 Users invoke the skill from a course project directory that has a `CLAUDE.md` referencing this skill:
