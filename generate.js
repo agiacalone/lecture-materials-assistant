@@ -15,6 +15,7 @@ const generatorPaths = {
   readme: "./generators/readme",
   slides: "./generators/slides",
   bank: "./generators/question-bank",
+  "bank-csv": "./generators/question-bank-csv",
   exam: "./generators/exam",
 };
 
@@ -28,7 +29,7 @@ function printHelp() {
       "  node generate.js --config lecture.json --artifact slides",
       "",
       "Artifacts:",
-      "  notes, notes-md, cornell, cornell-md, questions, quiz, quiz-md, readme, slides, bank, exam",
+      "  notes, notes-md, cornell, cornell-md, questions, quiz, quiz-md, readme, slides, bank, bank-csv, exam",
       "",
       "Flags:",
       "  --config <file>    Path to lecture spec JSON",
