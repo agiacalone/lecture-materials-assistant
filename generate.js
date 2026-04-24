@@ -6,6 +6,7 @@ const { ensureDir } = require("./lib/files");
 
 const generatorPaths = {
   notes: "./generators/lecture-notes",
+  "notes-md": "./generators/lecture-notes-md",
   cornell: "./generators/cornell-handout",
   questions: "./generators/study-questions",
   quiz: "./generators/quiz",
@@ -15,7 +16,7 @@ const generatorPaths = {
   exam: "./generators/exam",
 };
 
-const DEFAULT_ARTIFACTS = ["notes", "cornell", "questions", "quiz", "readme", "slides"];
+const DEFAULT_ARTIFACTS = ["notes", "notes-md", "cornell", "questions", "quiz", "readme", "slides"];
 
 function printHelp() {
   process.stdout.write(
@@ -25,7 +26,7 @@ function printHelp() {
       "  node generate.js --config lecture.json --artifact slides",
       "",
       "Artifacts:",
-      "  notes, cornell, questions, quiz, readme, slides, bank, exam",
+      "  notes, notes-md, cornell, questions, quiz, readme, slides, bank, exam",
       "",
       "Flags:",
       "  --config <file>    Path to lecture spec JSON",
