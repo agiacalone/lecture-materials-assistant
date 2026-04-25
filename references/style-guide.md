@@ -38,7 +38,7 @@ Student handouts and instructor lecture notes are printed teaching materials. Us
 color intentionally so instructors and students can locate structure quickly in the
 middle of a live public lecture.
 
-Color in printed `.docx` artifacts is functional, not decorative:
+Color in printed PDF artifacts is functional, not decorative:
 - section headers should visibly segment the page
 - cue columns, badges, and callouts should be distinguishable at a glance
 - prompts, definitions, warnings, and takeaways should use consistent color families
@@ -53,7 +53,7 @@ preserve light fills and dark accents well enough to serve as lecture cues.
 
 ## Symbols Policy
 
-Symbols may be used in printed `.docx` materials to add clarity, but they are
+Symbols may be used in printed PDF materials to add clarity, but they are
 secondary to text labels and color. Use them sparingly as redundant cues, not as a
 third visual system competing for attention.
 
@@ -84,14 +84,12 @@ Bordered box, Menlo 10pt, 4pt internal padding. A small language label (e.g., `C
 `Python`, `pseudocode`) appears in muted gray above the block when the language is
 not obvious from context.
 
-**In lecture notes and study questions (.docx):** light gray background `F5F5F5`,
-1pt solid border `CCCCCC`, full column width. Implemented in the generation script as
-a `Table` with a single cell: `shading: { fill: "F5F5F5" }`, border on all sides at
-1pt `CCCCCC`, internal padding 4pt. Each line of code is a `Paragraph` inside the
-cell using a `TextRun` with `font: "Menlo"` (fallback `"Courier New"`), size 20 (10pt).
+**In lecture notes and quiz (.tex/.pdf):** `\begin{lstlisting}` from the `listings`
+package, framed, monospaced, 5%-black background, full text-width. Use `language=`
+hint when the language is recognized by `listings`; otherwise omit.
 
-**In Cornell handout (.docx):** same construction, but the table width is constrained
-to the notes column (6480 DXA). If a block would exceed ~10 lines, split across rows
+**In Cornell handout (.tex/.pdf):** same `lstlisting` block, kept narrow enough to
+fit inside the notes column. If a block would exceed ~10 lines, split across rows
 or use an ellipsis comment (`// ...`) to abbreviate.
 
 **In slides (.pptx):** dark panel `1E293B`, Menlo 11pt, body text color `F1F5F9`.
@@ -106,8 +104,7 @@ key lines and replace omitted sections with a comment: `// ... (full impl in not
 
 **In question bank (.md):** standard fenced code block with language hint.
 
-**In exam (.lyx):** `\begin_inset listings` with Menlo typewriter font, as established
-by the existing exam format.
+**In exam (.tex):** `\begin{lstlisting}` (same package as the lecture-note PDFs).
 
 ### Pseudocode
 
@@ -136,7 +133,7 @@ If a concept is taught visually on a slide (state machine, memory layout, sequen
 diagram, network topology, tree/hierarchy), it must appear in the lecture notes and
 Cornell handout in some form. Do not leave major visual concepts slide-only.
 
-### Diagram Representation in .docx Artifacts
+### Diagram Representation in PDF Artifacts
 
 The `docx` npm package cannot render vector diagrams. Use structured tables and
 bordered text boxes to approximate diagrams:
@@ -174,7 +171,7 @@ actor. Highlight the current step in amber `F59E0B`.
 
 ---
 
-## Lecture Notes (.docx)
+## Lecture Notes (.pdf)
 
 - **Font:** Arial throughout
 - **Colors:** Navy headers `1F3864`, blue accent `2E5FA3`, body text black
@@ -221,7 +218,7 @@ Dark navy header `1F3864` white text; alternating white / `F0F4FA` rows.
 
 ---
 
-## Cornell Handout (.docx)
+## Cornell Handout (.pdf)
 
 **Design premise:** The handout is distributed before class via Canvas. Students bring
 it to lecture and fill in blanks from the projected slides. The professor adds verbal
@@ -245,13 +242,38 @@ able to spot those same regions instantly while presenting.
 
 ### Layout
 
-2-column table, full width:
-- **Left cue column:** 2880 DXA (~2"), blue `F0F4FA` background, bold navy cue keywords
-- **Right notes column:** 6480 DXA (~4.5"), white background, content + blanks
-- **Vertical divider:** solid blue `2E5FA3`, 8pt weight
+Rendered with LaTeX (`pdflatex`) via `lib/cornell-tex.js`. Per-section content uses
+a 2-column `tabularx`, full width:
+- **Left cue column:** ~26% of text width, tinted in the section's "kind" color
+  (very light shade), bold cue keywords in the section's accent color
+- **Right notes column:** remainder of text width, scaffolded prose or yellow fill-in cell
+- **Vertical divider:** 2pt rule in the section's accent color
 
-Keep these colors visible in print. The cue column and divider are part of the live
-navigation system for the handout, not optional decoration.
+Each section's color carries through three places — banner fill, cue tint, and KEY
+callout — so a student flipping through can read which "kind" of section they are
+in at a glance.
+
+### Section "Kind" Colors
+
+The section banner color encodes the section's role in the lecture rhythm. Set
+`section.kind` in the spec; if omitted, the generator picks a positional default
+(first → motivation, last → synthesis, middle → concept).
+
+| Kind | Color | When to use |
+|---|---|---|
+| `motivation` | teal `0F766E` | opening section that grounds the topic in a concrete problem |
+| `concept` | navy `1F3864` | core conceptual content (default for middle sections) |
+| `strategy` | indigo `4338CA` | comparing approaches, decision frameworks |
+| `application` | green `15803D` | when-to-use, applied examples |
+| `case-study` | purple `6D28D9` | extended worked example or named historical case |
+| `pitfall` | rose `BE185D` | common mistakes, anti-patterns (use sparingly) |
+| `synthesis` | amber `B45309` | wrap-up, connection back to the bigger picture |
+
+Functional regions keep stable semantic colors regardless of section kind:
+- **Fill-in cells:** yellow `FEF9C3` (universal "fill in here" convention)
+- **Learning Objectives box:** light green `F0FDF4` with green left bar
+- **Vocabulary grid:** light lavender `F5F3FF` with purple left bar
+- **Summary strip:** light blue `DBEAFE` with blue top bar
 
 ### Blank Types (mix deliberately)
 
@@ -320,7 +342,7 @@ to scaffolded text.
 
 ---
 
-## Study Questions (.docx)
+## Study Questions (.md)
 
 - **Count:** 10 questions
 - **Tiers:**
@@ -349,7 +371,7 @@ to scaffolded text.
 
 ---
 
-## Pop Quiz (.docx)
+## Pop Quiz (.pdf)
 
 - **Count:** 5 questions
 - **Time:** ~10 minutes

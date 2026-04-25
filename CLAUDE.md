@@ -54,9 +54,9 @@ the formats split into two tiers:
 | Assembled assessments | regenerated `.pdf` — the kept form is the bank + exam spec |
 
 Never add a "kept" format in a proprietary or tool-specific binary — the
-principle is open, easy-to-track, tool-agnostic text. The disposables can be
-whatever the lecture-day target audience needs (`.pdf` for print, `.pptx` for
-projector, `.docx` for editing on iPad).
+principle is open, easy-to-track, tool-agnostic text. The disposables are the
+print/projector deliverables: `.pdf` (lecture notes, Cornell handout, quiz, exam)
+for hand-out and `.pptx` for the projector.
 
 ## Skill Invocation
 
@@ -109,14 +109,16 @@ structural reference, but exam output is produced through the checked-in
 
 | File | Format | Key constraints |
 |------|--------|-----------------|
-| `[topic]_lecture_notes.docx` | Lecture notes | Arial, navy/blue headers, 8 callout types |
-| `[topic]_cornell_handout.docx` | Student handout | 2-col layout, ~40% slide-content coverage, strategic omissions, blank audit required |
-| `[topic]_study_questions.docx` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze; reinforce lecture without recreating slides |
-| `[topic]_quiz.docx` | Pop quiz | 5 questions (~10 min), MC+short answer, answer key on last page |
+| `[topic]_lecture_notes.pdf` | Lecture notes | LaTeX, Computer Modern, navy/teal/amber/indigo callouts; `.tex` source retained |
+| `[topic]_cornell_handout.pdf` | Student handout | 2-col Cornell layout, ~40% slide-content coverage, section-kind colors (motivation=teal / concept=navy / synthesis=amber / strategy=indigo / application=green / case-study=purple / pitfall=rose) anchor each section's banner, cue-tint, and KEY callout; `.tex` retained |
+| `[topic]_study_questions.md` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze; Markdown only — no print form generated |
+| `[topic]_quiz.pdf` + `[topic]_quiz_key.pdf` | Pop quiz | 5 questions (~10 min), MC+short answer, separate key PDF; `.tex` retained |
 | `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
 | `[course_num]-exam-[n]-[term].pdf` | Exam | Assembled from bank(s), compiled to PDF via pdflatex; `.tex` source retained alongside; generator toggles `\answerstrue` and recompiles for the key |
 | `README.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
 | `[topic]_slides.pptx` | Slide deck | 14–18 slides, CS Modern dark slate theme, mandatory indigo stripe + badge |
+
+The `.docx` format is no longer emitted by any generator — all printed handouts render to PDF via `pdflatex`.
 
 ## Required npm/pip Dependencies (user installs once)
 

@@ -1,8 +1,8 @@
 ---
 name: lecture-materials-assistant
 description: >
-  Generates lecture material sets for CS professors: lecture notes (.docx),
-  Cornell note-taking handouts (.docx), study questions (.docx), pop quizzes (.docx),
+  Generates lecture material sets for CS professors: lecture notes (.pdf),
+  Cornell note-taking handouts (.pdf), study questions (.md), pop quizzes (.pdf),
   GitHub Classroom README assignments (.md), topic-wide question banks (.md),
   assembled exams (.tex/.pdf), and slide decks (.pptx). Use this skill whenever a
   user asks to generate, create, assemble, revise, or extend any lecture materials,
@@ -56,14 +56,16 @@ block on that field alone.
 
 | Artifact | File | When |
 |---|---|---|
-| Lecture notes | `[topic]_lecture_notes.docx` | Instructor copy with speaker notes, timing, and callouts; not student-facing |
-| Cornell handout | `[topic]_cornell_handout.docx` | Student guided notes with roughly 40% slide coverage and strategic omissions |
-| Study questions | `[topic]_study_questions.docx` | 10 tiered review questions that reinforce the lecture without recreating it |
-| Pop quiz | `[topic]_quiz.docx` | 5-question in-class quiz with instructor answer key |
+| Lecture notes | `[topic]_lecture_notes.pdf` (`.tex` retained) | Instructor copy with speaker notes, timing, and callouts; not student-facing |
+| Cornell handout | `[topic]_cornell_handout.pdf` (`.tex` retained) | Student guided notes with roughly 40% slide coverage and strategic omissions; section colors keyed to section "kind" |
+| Study questions | `[topic]_study_questions.md` | 10 tiered review questions that reinforce the lecture without recreating it (kept-form Markdown; no print form yet) |
+| Pop quiz | `[topic]_quiz.pdf` + `[topic]_quiz_key.pdf` (`.tex` retained) | 5-question in-class quiz with separate instructor answer-key PDF |
 | Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |
 | Exam | `[course_num]-exam-[n]-[term].pdf` | Assembled from bank(s), compiled via pdflatex; `.tex` source retained; generator toggles `\answerstrue` and recompiles for the key |
 | GitHub README | `README.md` | GitHub Classroom assignment (reading or lab/programming variant) |
 | Slide deck | `[topic]_slides.pptx` | 14–18 slides, CS Modern dark slate theme |
+
+All printed-handout artifacts (lecture notes, Cornell handout, pop quiz, exam) render to PDF via `pdflatex`. The `.docx` format is no longer emitted by any generator.
 
 **Default (generate everything — single session):**
 > "Generate lecture materials for [TOPIC] in [COURSE]. Cover: [KEY CONCEPTS]. Case studies: [EXAMPLES]. ~[N] minutes."
@@ -114,7 +116,10 @@ npm install docx pptxgenjs
 npm install markdown-it
 ```
 
-For exams, ensure a LaTeX toolchain is available:
+A LaTeX toolchain with `pdflatex` is required for the lecture-notes, Cornell, quiz,
+and exam PDFs. Required TeX packages: `texlive-needspace`, `texlive-ec`,
+`texlive-tabulary`, `texlive-mdframed`, `texlive-collection-fontsrecommended`
+(for `lmodern`):
 ```bash
 pdflatex --version
 ```
@@ -125,15 +130,16 @@ pdflatex --version
 init-spec.js             # scaffold a lecture spec from prompt-like inputs
 generate.js              # CLI orchestrator for the standard lecture set
 examples/
-  lecture-spec.json      # sample lecture input
+  deadlock-spec.json     # sample lecture input
 lib/
-  docx-helpers.js        # shared docx construction helpers
+  tex-helpers.js         # shared LaTeX preamble + helpers + pdflatex driver
+  cornell-tex.js         # Cornell-handout LaTeX palette + helpers
   pptx-helpers.js        # slide helpers
 generators/
-  lecture-notes.js       # → [topic]_lecture_notes.docx
-  cornell-handout.js     # → [topic]_cornell_handout.docx
-  study-questions.js     # → [topic]_study_questions.docx
-  quiz.js                # → [topic]_quiz.docx
+  lecture-notes.js       # → [topic]_lecture_notes.tex + .pdf
+  cornell-handout.js     # → [topic]_cornell_handout.tex + .pdf
+  study-questions.js     # → [topic]_study_questions.md
+  quiz.js                # → [topic]_quiz.tex/.pdf + [topic]_quiz_key.tex/.pdf
   readme.js              # → README.md
   slides.js              # → [topic]_slides.pptx
   question-bank.js       # → [topic]_question_bank.md
@@ -171,11 +177,10 @@ request into the lecture spec JSON rather than writing generator code.
 If a user request is incomplete, scaffold the spec with the best available defaults,
 then fill gaps conservatively instead of regenerating new `.js` files.
 
-**Packages:**
-- `.docx` → `docx` npm package (v9+)
-- `.pptx` → `pptxgenjs` npm package (v4+)
-- `.md` question bank / README → plain text or Markdown helpers as needed
-- `.tex` / `.pdf` exam → LaTeX toolchain (`pdflatex`)
+**Toolchain:**
+- `.tex` / `.pdf` (lecture notes, Cornell handout, quiz, exam) → LaTeX (`pdflatex`)
+- `.pptx` (slide deck) → `pptxgenjs` npm package (v4+)
+- `.md` (question bank, README, study questions) → plain Markdown
 
 When updating existing materials, update the lecture spec first and preserve scope,
 numbering, and file naming unless the user asks for a restructure. For question
