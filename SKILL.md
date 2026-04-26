@@ -57,7 +57,7 @@ block on that field alone.
 | Artifact | File | When |
 |---|---|---|
 | Lecture notes | `[topic]_lecture_notes.pdf` (`.tex` retained) | Instructor copy with speaker notes, timing, and callouts; not student-facing |
-| Cornell handout | `[topic]_cornell_handout.pdf` (`.tex` retained) | Student guided notes with roughly 40% slide coverage and strategic omissions; section colors keyed to section "kind" |
+| Cornell handout | `[topic]_cornell_handout.pdf` + `[topic]_cornell_handout_key.pdf` (`.tex` retained) | Student guided notes with roughly 40% slide coverage and strategic omissions; section colors keyed to section "kind". Key PDF reveals `blanks[].answers` and `vocabulary[].definition` in red bold inside the yellow cells, with a red "ANSWER KEY — INSTRUCTOR USE ONLY" banner at the top |
 | Study questions | `[topic]_study_questions.md` | 10 tiered review questions that reinforce the lecture without recreating it (kept-form Markdown; no print form yet) |
 | Pop quiz | `[topic]_quiz.pdf` + `[topic]_quiz_key.pdf` (`.tex` retained) | 5-question in-class quiz with separate instructor answer-key PDF |
 | Question bank | `[topic]_question_bank.md` | ~50 tagged questions (mc/tf/code/fib/sa), scoped to full topic (2–4 sessions) |

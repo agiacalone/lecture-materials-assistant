@@ -275,6 +275,23 @@ Functional regions keep stable semantic colors regardless of section kind:
 - **Vocabulary grid:** light lavender `F5F3FF` with purple left bar
 - **Summary strip:** light blue `DBEAFE` with blue top bar
 
+### Answer Key (instructor use)
+
+Each Cornell handout build emits two PDFs from a single `.tex` source:
+- `[topic]_cornell_handout.pdf` — student copy (yellow cells empty for handwriting / typing)
+- `[topic]_cornell_handout_key.pdf` — instructor copy with the answers shown in red bold inside the yellow cells, plus a red `*** ANSWER KEY — INSTRUCTOR USE ONLY ***` banner at the top of page 1
+
+Generation uses the same toggle pattern as `quiz.js`: `\newif\ifanswers` in the
+preamble, compiled twice (once with `\answersfalse`, then string-replaced to
+`\answerstrue` for the key). Spec fields that drive the key:
+
+- `blanks[].answers` — array of strings, one per `_______` slot in the blank's `template`. A single string is also accepted as syntactic sugar for `[answer]`. Missing answers render as `?` in the key so gaps are visually obvious.
+- `vocabulary` — accept either the legacy `string[]` form (terms only; key vocabulary cells stay blank) or `[{term, definition}]` (definitions appear in red bold inside the yellow cells in the key).
+
+Scaffold rows derived from `section.points` are not "blanks with answers" —
+they are discussion prompts the instructor narrates during lecture. They render
+identically in both versions.
+
 ### Blank Types (mix deliberately)
 
 | Type | Example |

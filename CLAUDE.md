@@ -110,7 +110,7 @@ structural reference, but exam output is produced through the checked-in
 | File | Format | Key constraints |
 |------|--------|-----------------|
 | `[topic]_lecture_notes.pdf` | Lecture notes | LaTeX, Computer Modern, navy/teal/amber/indigo callouts; `.tex` source retained |
-| `[topic]_cornell_handout.pdf` | Student handout | 2-col Cornell layout, ~40% slide-content coverage, section-kind colors (motivation=teal / concept=navy / synthesis=amber / strategy=indigo / application=green / case-study=purple / pitfall=rose) anchor each section's banner, cue-tint, and KEY callout; `.tex` retained |
+| `[topic]_cornell_handout.pdf` + `[topic]_cornell_handout_key.pdf` | Student handout + answer key | 2-col Cornell layout, ~40% slide-content coverage, section-kind colors (motivation=teal / concept=navy / synthesis=amber / strategy=indigo / application=green / case-study=purple / pitfall=rose) anchor each section's banner, cue-tint, and KEY callout. Key reveals `blanks[].answers` and vocabulary definitions in red bold inside the yellow cells. `.tex` for both retained |
 | `[topic]_study_questions.md` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze; Markdown only — no print form generated |
 | `[topic]_quiz.pdf` + `[topic]_quiz_key.pdf` | Pop quiz | 5 questions (~10 min), MC+short answer, separate key PDF; `.tex` retained |
 | `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
