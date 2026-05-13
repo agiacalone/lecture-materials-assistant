@@ -26,6 +26,13 @@
 \newif\ifanswers
 \answersfalse   % <-- change to \answerstrue for answer key
 
+% Bridge: pa-exam-build injects \def\answersmode{1} for the key build.
+% If \answersmode is defined, flip \answerstrue. LaTeX-native \answerstrue still
+% works directly if someone edits the .tex.
+\makeatletter
+\@ifundefined{answersmode}{}{\answerstrue}
+\makeatother
+
 % --- Exam serial (variant-level; per-file fingerprint set at build time) ---
 \providecommand{\examserial}{XXXXXXXX}
 
