@@ -1,1 +1,527 @@
-/* styling added in a later task */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Terminal Theme — Slidev skin
+   Phosphor-green · Monospace everywhere · Scanline overlay
+   Design tokens live on :root so components re-skin via the SAME CSS var
+   names as Blueprint — Schematic.vue / EventChain.vue read --bp-* vars.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* ── Design tokens ───────────────────────────────────────────────────────── */
+:root {
+  /* Core palette — phosphor/hacker */
+  --bp-bg:          #0b0f0b;           /* near-black */
+  --bp-ink:         #cfe8d6;           /* phosphor green-white ink */
+  --bp-muted:       #5f7a66;           /* muted phosphor for labels */
+  --bp-accent:      #33ff8a;           /* primary phosphor green */
+  --bp-secondary:   #ffcc66;           /* amber secondary */
+  --bp-hairline:    rgba(51,255,138,0.07); /* faint grid lines */
+  --bp-hairline-strong: rgba(51,255,138,0.15); /* emphasis lines */
+
+  /* Surface tiers */
+  --bp-surface-1:   rgba(51,255,138,0.04);  /* slide card bg lift */
+  --bp-surface-2:   rgba(51,255,138,0.09);  /* hover / active surface */
+  --bp-border:      rgba(51,255,138,0.18);  /* borders, dividers */
+
+  /* Typography — monospace everywhere */
+  --bp-font-display: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --bp-font-body:    'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --bp-font-mono:    'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Grid cell size */
+  --bp-grid-size:   32px;
+
+  /* Faint phosphor grid gradient (repeated both axes) */
+  --bp-grid-bg:
+    linear-gradient(var(--bp-hairline) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-hairline) 1px, transparent 1px);
+
+  /* Scanline overlay: subtle horizontal repeating gradient ~3px bands */
+  --bp-scanline-bg:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0,0,0,0.18) 2px,
+      rgba(0,0,0,0.18) 3px
+    );
+
+  /* Spacing scale */
+  --bp-space-xs:  0.25rem;
+  --bp-space-sm:  0.5rem;
+  --bp-space-md:  1rem;
+  --bp-space-lg:  1.5rem;
+  --bp-space-xl:  2.5rem;
+  --bp-space-2xl: 4rem;
+
+  /* Corner radius — terminal: sharper than blueprint */
+  --bp-radius-sm:  2px;
+  --bp-radius-md:  3px;
+  --bp-radius-lg:  4px;
+
+  /* Transition */
+  --bp-transition: 150ms ease;
+
+  /* Slidev variable overrides */
+  --slidev-theme-primary: var(--bp-accent);
+  --slidev-code-background: rgba(0,0,0,0.55);
+}
+
+/* ── Base slide surface: grid + scanline overlay ─────────────────────────── */
+.slidev-layout {
+  background-color: var(--bp-bg);
+  background-image:
+    var(--bp-scanline-bg),
+    var(--bp-grid-bg);
+  background-size:
+    100% 3px,
+    var(--bp-grid-size) var(--bp-grid-size);
+  background-position: 0 0;
+  color: var(--bp-ink);
+  font-family: var(--bp-font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ── Headings ─────────────────────────────────────────────────────────────── */
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4 {
+  font-family: var(--bp-font-display);
+  color: var(--bp-accent);
+  letter-spacing: 0.05em;
+  line-height: 1.15;
+  margin-top: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.slidev-layout h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  margin-bottom: var(--bp-space-lg);
+  padding-bottom: var(--bp-space-sm);
+  border-bottom: 2px solid var(--bp-accent);
+  /* Phosphor glow on headline */
+  text-shadow: 0 0 12px rgba(51,255,138,0.55), 0 0 28px rgba(51,255,138,0.25);
+}
+
+.slidev-layout h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: var(--bp-space-md);
+  /* Prompt-style left bar */
+  padding-left: var(--bp-space-md);
+  border-left: 3px solid var(--bp-accent);
+  text-shadow: 0 0 8px rgba(51,255,138,0.35);
+}
+
+.slidev-layout h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--bp-secondary);
+  margin-bottom: var(--bp-space-sm);
+  text-shadow: 0 0 6px rgba(255,204,102,0.3);
+}
+
+.slidev-layout h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--bp-muted);
+  letter-spacing: 0.12em;
+  margin-bottom: var(--bp-space-xs);
+}
+
+/* ── Body text ───────────────────────────────────────────────────────────── */
+.slidev-layout p {
+  color: var(--bp-ink);
+  margin-bottom: var(--bp-space-md);
+}
+
+.slidev-layout em {
+  color: var(--bp-secondary);
+  font-style: italic;
+}
+
+.slidev-layout strong {
+  color: var(--bp-accent);
+  font-weight: 700;
+}
+
+/* ── Lists ───────────────────────────────────────────────────────────────── */
+.slidev-layout ul,
+.slidev-layout ol {
+  padding-left: 1.4em;
+  margin-bottom: var(--bp-space-md);
+}
+
+.slidev-layout li {
+  margin-bottom: 0.35em;
+  color: var(--bp-ink);
+}
+
+/* Custom bullet: phosphor chevron prompt */
+.slidev-layout ul > li::marker {
+  content: '>  ';
+  color: var(--bp-accent);
+  font-weight: 700;
+  font-family: var(--bp-font-mono);
+  font-size: 1.05em;
+}
+
+.slidev-layout ol > li::marker {
+  color: var(--bp-accent);
+  font-weight: 700;
+  font-family: var(--bp-font-mono);
+  font-size: 0.9em;
+}
+
+/* Nested list */
+.slidev-layout ul ul > li::marker,
+.slidev-layout ol ol > li::marker {
+  color: var(--bp-secondary);
+}
+
+/* ── Inline code ─────────────────────────────────────────────────────────── */
+.slidev-layout code:not(pre code) {
+  font-family: var(--bp-font-mono);
+  font-size: 0.88em;
+  background: rgba(51,255,138,0.08);
+  border: 1px solid var(--bp-border);
+  border-radius: var(--bp-radius-sm);
+  padding: 0.1em 0.35em;
+  color: var(--bp-accent);
+  text-shadow: 0 0 6px rgba(51,255,138,0.4);
+}
+
+/* ── Code blocks (Shiki / prism) ─────────────────────────────────────────── */
+.slidev-layout pre {
+  background: rgba(0,0,0,0.55) !important;
+  border: 1px solid var(--bp-border);
+  border-radius: var(--bp-radius-md);
+  padding: var(--bp-space-lg) !important;
+  font-family: var(--bp-font-mono) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.55;
+  overflow-x: auto;
+  /* Phosphor left accent bar */
+  border-left: 3px solid var(--bp-accent);
+  box-shadow: 0 0 18px rgba(51,255,138,0.08), inset 0 0 24px rgba(0,0,0,0.3);
+}
+
+.slidev-layout pre code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  color: var(--bp-ink);
+}
+
+/* Shiki line numbers if enabled */
+.slidev-layout .shiki .line-number {
+  color: var(--bp-muted);
+  font-size: 0.75em;
+  margin-right: 1.2em;
+  user-select: none;
+}
+
+/* ── Blockquote ──────────────────────────────────────────────────────────── */
+.slidev-layout blockquote {
+  border-left: 3px solid var(--bp-secondary);
+  padding: var(--bp-space-sm) var(--bp-space-md);
+  background: var(--bp-surface-1);
+  border-radius: 0 var(--bp-radius-md) var(--bp-radius-md) 0;
+  color: var(--bp-muted);
+  font-style: italic;
+  margin: var(--bp-space-md) 0;
+}
+
+/* ── Links ───────────────────────────────────────────────────────────────── */
+.slidev-layout a {
+  color: var(--bp-accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(51,255,138,0.35);
+  transition: border-color var(--bp-transition), color var(--bp-transition),
+              text-shadow var(--bp-transition);
+}
+
+.slidev-layout a:hover {
+  color: #77ffb3;
+  border-bottom-color: #77ffb3;
+  text-shadow: 0 0 8px rgba(51,255,138,0.6);
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.slidev-layout table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: var(--bp-space-md) 0;
+  font-family: var(--bp-font-mono);
+}
+
+.slidev-layout thead tr {
+  background: rgba(51,255,138,0.07);
+  border-bottom: 1px solid var(--bp-border);
+}
+
+.slidev-layout th {
+  font-family: var(--bp-font-mono);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--bp-accent);
+  padding: var(--bp-space-sm) var(--bp-space-md);
+  text-align: left;
+  font-weight: 700;
+}
+
+.slidev-layout td {
+  padding: var(--bp-space-xs) var(--bp-space-md);
+  border-bottom: 1px solid rgba(51,255,138,0.06);
+  color: var(--bp-ink);
+}
+
+.slidev-layout tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── COVER layout ──────────────────────────────────────────────────────────
+   Full-height terminal, centered content, phosphor headline with caret.
+   ─────────────────────────────────────────────────────────────────────────*/
+.slidev-layout.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--bp-space-2xl) var(--bp-space-2xl);
+}
+
+.slidev-layout.cover h1 {
+  font-size: 3rem;
+  line-height: 1.05;
+  letter-spacing: 0.06em;
+  max-width: 22ch;
+  border-bottom: none;
+  margin-bottom: var(--bp-space-lg);
+  position: relative;
+  text-shadow: 0 0 18px rgba(51,255,138,0.65), 0 0 40px rgba(51,255,138,0.25);
+}
+
+/* Prompt prefix bar above title */
+.slidev-layout.cover h1::before {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 2px;
+  background: var(--bp-accent);
+  margin-bottom: var(--bp-space-md);
+  box-shadow: 0 0 10px rgba(51,255,138,0.6);
+}
+
+/* Blinking cursor after the title text */
+.slidev-layout.cover h1::after {
+  content: '_';
+  display: inline-block;
+  color: var(--bp-accent);
+  font-weight: 400;
+  margin-left: 0.15em;
+  animation: terminal-blink 1.1s step-end infinite;
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.slidev-layout.cover p {
+  font-size: 1rem;
+  color: var(--bp-secondary);
+  max-width: 52ch;
+  margin-top: 0;
+  letter-spacing: 0.03em;
+}
+
+/* Course/info meta below tagline */
+.slidev-layout.cover .info-line {
+  margin-top: var(--bp-space-xl);
+  font-family: var(--bp-font-mono);
+  font-size: 0.68rem;
+  color: var(--bp-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── TWO-COLS layout ───────────────────────────────────────────────────────
+   Split layout: left column has a phosphor divider rule.
+   ─────────────────────────────────────────────────────────────────────────*/
+.slidev-layout.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 0 var(--bp-space-xl);
+  padding: var(--bp-space-xl);
+}
+
+/* h2/h1 headline spans full width */
+.slidev-layout.two-cols > h2,
+.slidev-layout.two-cols > h1 {
+  grid-column: 1 / -1;
+}
+
+/* Left column */
+.slidev-layout.two-cols .col-left,
+.slidev-layout.two-cols > div:first-of-type {
+  border-right: 1px solid var(--bp-border);
+  padding-right: var(--bp-space-lg);
+}
+
+/* Right column */
+.slidev-layout.two-cols .col-right {
+  padding-left: var(--bp-space-sm);
+}
+
+/* ── CENTER layout (key / section-divider) ─────────────────────────────────
+   Centered phosphor headline, double-rule border.
+   ─────────────────────────────────────────────────────────────────────────*/
+.slidev-layout.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--bp-space-xl) var(--bp-space-2xl);
+}
+
+.slidev-layout.center h1 {
+  font-size: 3rem;
+  max-width: 22ch;
+  line-height: 1.1;
+  border-bottom: none;
+  letter-spacing: 0.05em;
+  /* Double-rule frame in phosphor */
+  padding: var(--bp-space-xl) var(--bp-space-lg);
+  border-top: 2px solid var(--bp-accent);
+  border-bottom: 2px solid var(--bp-accent);
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(51,255,138,0.5);
+}
+
+/* No decorative ::before on center (suppress cover's rule) */
+.slidev-layout.center h1::before {
+  display: none;
+}
+
+/* No blink cursor on center layout */
+.slidev-layout.center h1::after {
+  display: none;
+}
+
+.slidev-layout.center p {
+  margin-top: var(--bp-space-md);
+  color: var(--bp-muted);
+  font-size: 1rem;
+  max-width: 42ch;
+}
+
+/* ── DEFAULT layout ─────────────────────────────────────────────────────── */
+.slidev-layout.default {
+  padding: var(--bp-space-xl) var(--bp-space-xl);
+}
+
+.slidev-layout.default h2 {
+  margin-bottom: var(--bp-space-md);
+}
+
+/* ── Footer / slide chrome ─────────────────────────────────────────────────
+   All chrome: monospace + muted phosphor.
+   ─────────────────────────────────────────────────────────────────────────*/
+.slidev-page-number,
+.slidev-controls,
+.slidev-nav {
+  font-family: var(--bp-font-mono) !important;
+  color: var(--bp-muted) !important;
+  font-size: 0.7rem;
+}
+
+/* Slide number badge — bottom right corner monospace */
+.slidev-layout .slide-no {
+  position: absolute;
+  bottom: var(--bp-space-sm);
+  right: var(--bp-space-md);
+  font-family: var(--bp-font-mono);
+  font-size: 0.62rem;
+  color: var(--bp-muted);
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
+/* ── Presenter notes ─────────────────────────────────────────────────────── */
+.slidev-presenter-notes {
+  font-family: var(--bp-font-mono);
+  font-size: 0.875rem;
+  color: var(--bp-ink);
+  line-height: 1.65;
+  background: #0a120a;
+  border-left: 3px solid var(--bp-secondary);
+  padding: var(--bp-space-md);
+  border-radius: 0 var(--bp-radius-md) var(--bp-radius-md) 0;
+}
+
+/* ── Highlight / mark ─────────────────────────────────────────────────────── */
+.slidev-layout mark {
+  background: rgba(51,255,138,0.18);
+  color: var(--bp-accent);
+  border-radius: 2px;
+  padding: 0.05em 0.25em;
+  text-shadow: 0 0 6px rgba(51,255,138,0.45);
+}
+
+/* ── Dividers ─────────────────────────────────────────────────────────────── */
+.slidev-layout hr {
+  border: none;
+  border-top: 1px solid var(--bp-border);
+  margin: var(--bp-space-lg) 0;
+}
+
+/* ── Utility classes (usable in slide markdown) ─────────────────────────── */
+.text-accent    { color: var(--bp-accent); }
+.text-muted     { color: var(--bp-muted); }
+.text-secondary { color: var(--bp-secondary); }
+.font-mono      { font-family: var(--bp-font-mono); }
+.font-display   { font-family: var(--bp-font-display); }
+
+/* ── Transitions (Slidev built-in) ─────────────────────────────────────────
+   Phosphor fade — fast snap like a CRT switching states.
+   ─────────────────────────────────────────────────────────────────────────*/
+.slidev-vclick-target {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.slidev-vclick-hidden {
+  opacity: 0;
+  transform: translateY(3px);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+.slidev-layout ::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.slidev-layout ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.slidev-layout ::-webkit-scrollbar-thumb {
+  background: var(--bp-border);
+  border-radius: 2px;
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+.slidev-layout ::selection {
+  background: rgba(51,255,138,0.22);
+  color: var(--bp-ink);
+}
