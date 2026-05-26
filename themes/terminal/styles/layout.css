@@ -70,6 +70,7 @@
 
 /* ── Base slide surface: grid + scanline overlay ─────────────────────────── */
 .slidev-layout {
+  height: 100%;
   background-color: var(--bp-bg);
   background-image:
     var(--bp-scanline-bg),
@@ -82,6 +83,13 @@
   font-family: var(--bp-font-body);
   font-size: 1rem;
   line-height: 1.6;
+}
+
+/* Hide Slidev's Goto (go-to-slide) autocomplete dropdown — it can render
+   stuck-open over slide content; overview ('o') + arrow nav remain. */
+.slidev-nav .autocomplete .list,
+.autocomplete .list {
+  display: none !important;
 }
 
 /* ── Headings ─────────────────────────────────────────────────────────────── */
