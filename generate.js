@@ -176,10 +176,9 @@ async function runArtifact({ artifact, parsed, slug, outDir, log, opts }) {
       return;
     }
     case 'slides': {
-      const result = await generateSlides(parsed, { outputDir: outDir, noPdf: opts.noPdf, ...filterOpts });
-      const pdfName = result.filename.replace(/\.tex$/, '.pdf');
-      const suffix = opts.noPdf ? '' : ` + ${pdfName}`;
-      log.info(`✓ slides → ${result.filename}${suffix} (${result.slideCount} slides)`);
+      const result = await generateSlides(parsed, { outputDir: outDir, ...filterOpts });
+      const themeLabel = result.theme ? ` [theme: ${result.theme}]` : '';
+      log.info(`✓ slides → ${result.filename} (${result.slideCount} slides)${themeLabel}`);
       reportWarnings('slides', result.warnings, log);
       return;
     }

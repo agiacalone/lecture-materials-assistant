@@ -1,61 +1,42 @@
-// Slides generator — Beamer LaTeX deck.
+// Slides generator — Slidev markdown deck.
 // Walks parsed.byRole.get('slide') in source order, dispatching each item
-// to a per-layout renderer. Writes a Beamer .tex file and runs pdflatex
-// twice to produce the .pdf (clean projection — no notes by default; the
-// .tex source contains \note{} blocks so a future --with-notes flag can
-// re-render the deck for instructor reference).
+// to a per-layout renderer. Writes a Slidev .md file for live HTML rendering
+// — no LaTeX or PDF involved.
 //
 // Layout dispatch (11 layouts): title, agenda, concept, split, code, diagram,
-// vocab, case-study, key, summary, section-divider.
+// vocab, case-study, key, summary, section-divider (+ blank fallback).
 //
-// Palette (matches references/style-guide.md):
-//   slatebg    #0F172A  background
-//   slatefg    #F1F5F9  primary text
-//   indigo     #6366F1  frametitles, dividers, accent stripe
-//   amber      #F59E0B  key callouts, highlights
-//   slatemuted #94A3B8  secondary text / footers
+// Theme selection by course number:
+//   326 → blueprint   (OS / systems courses)
+//   378 → blueprint   (intro security)
+//   478 → terminal    (advanced security)
+//   (default) → blueprint
 //
-// Humanize warnings (returned in result):
+// Pacing lint warnings (log.warn, not errors):
 //   - ≥4 consecutive same-layout slides
 //   - deck lacks a [layout:: key] pacing pause
 //   - deck lacks a [layout:: summary] closing slide
-//   - any single slide stays denser than 6 bullets after auto-split
-//   - title slide missing [tagline::] (soft note, not warning category)
 //
 // concept-layout density: >6 children → split into continuation slides
 // titled "<title> (cont.)" with the remaining children, in groups of 6.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { applyTermFilter } from './_filter.js';
 
-const require = createRequire(import.meta.url);
-const { compileLatex } = require('../lib/tex-helpers.js');
+// ESM-safe __dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const KNOWN_LAYOUTS = new Set([
   'title', 'agenda', 'concept', 'split', 'code', 'diagram',
-  'vocab', 'case-study', 'key', 'summary', 'section-divider',
+  'vocab', 'case-study', 'key', 'summary', 'section-divider', 'blank',
 ]);
 
-// ─── tex escaping ──────────────────────────────────────────────────────────
+// Course number → Slidev theme name
+const COURSE_THEME = { '326': 'blueprint', '378': 'blueprint', '478': 'terminal' };
 
-function texEscape(str) {
-  return String(str || '').replace(/[\\&%$#_{}~^]/g, (ch) => {
-    switch (ch) {
-      case '\\': return '\\textbackslash{}';
-      case '&':  return '\\&';
-      case '%':  return '\\%';
-      case '$':  return '\\$';
-      case '#':  return '\\#';
-      case '_':  return '\\_';
-      case '{':  return '\\{';
-      case '}':  return '\\}';
-      case '~':  return '\\textasciitilde{}';
-      case '^':  return '\\textasciicircum{}';
-    }
-  });
-}
+// ─── helpers ───────────────────────────────────────────────────────────────
 
 // Strip leading **bold** marker from item.text, returning { title, rest }.
 function splitBoldTitle(text) {
@@ -68,141 +49,71 @@ function childTexts(item) {
   return (item.children || []).map((c) => c.text);
 }
 
-// ─── preamble ──────────────────────────────────────────────────────────────
-
-function buildPreamble(parsed) {
-  const fm = parsed.frontmatter || {};
-  const docTitle = texEscape(fm.title || 'Lecture');
-  const meta = [fm.course, fm.term].filter(Boolean).map(texEscape).join(' \\textperiodcentered\\ ');
-  const subtitle = meta ? `\\subtitle{${meta}}` : '';
-
-  return `\\documentclass[aspectratio=169,11pt]{beamer}
-\\usepackage[T1]{fontenc}
-\\usepackage[utf8]{inputenc}
-\\usepackage{xcolor}
-\\usepackage{listings}
-
-% Palette — slate / indigo / amber from references/style-guide.md
-\\definecolor{slatebg}{HTML}{0F172A}
-\\definecolor{slatefg}{HTML}{F1F5F9}
-\\definecolor{slatemuted}{HTML}{94A3B8}
-\\definecolor{slatepanel}{HTML}{1E293B}
-\\definecolor{indigo}{HTML}{6366F1}
-\\definecolor{amber}{HTML}{F59E0B}
-
-% Theme — hand-rolled, no Beamer outer-theme chrome
-\\usefonttheme{professionalfonts}
-\\useinnertheme{rectangles}
-\\setbeamertemplate{navigation symbols}{}
-\\setbeamertemplate{footline}{%
-  \\hbox{%
-    \\hspace*{0.6em}{\\color{slatemuted}\\tiny\\insertshorttitle}\\hfill%
-    {\\color{slatemuted}\\tiny\\insertframenumber\\,/\\,\\inserttotalframenumber}\\hspace*{0.6em}%
-  }%
-  \\vspace*{0.3em}%
+function getField(item, name) {
+  return item && item.fields && typeof item.fields.get === 'function'
+    ? item.fields.get(name)
+    : null;
 }
 
-\\setbeamercolor{normal text}{fg=slatefg, bg=slatebg}
-\\setbeamercolor{background canvas}{bg=slatebg}
-\\setbeamercolor{frametitle}{fg=indigo, bg=slatebg}
-\\setbeamercolor{title}{fg=indigo, bg=slatebg}
-\\setbeamercolor{subtitle}{fg=slatemuted, bg=slatebg}
-\\setbeamercolor{author}{fg=slatemuted, bg=slatebg}
-\\setbeamercolor{itemize item}{fg=indigo}
-\\setbeamercolor{itemize subitem}{fg=indigo}
-\\setbeamercolor{itemize subsubitem}{fg=indigo}
-\\setbeamercolor{enumerate item}{fg=indigo}
-\\setbeamercolor{section in head/navigation}{fg=slatemuted}
-\\setbeamercolor{block title}{fg=slatefg, bg=indigo}
-\\setbeamercolor{block body}{fg=slatefg, bg=slatepanel}
-\\setbeamercolor{caption name}{fg=indigo}
-
-\\setbeamerfont{frametitle}{series=\\bfseries, size=\\large}
-\\setbeamerfont{title}{series=\\bfseries, size=\\Large}
-
-% Indigo accent stripe under each frametitle
-\\setbeamertemplate{frametitle}{%
-  \\nointerlineskip%
-  \\vspace*{0.5em}%
-  \\hspace*{0.6em}{\\usebeamercolor[fg]{frametitle}\\usebeamerfont{frametitle}\\insertframetitle}\\par%
-  \\vspace*{0.15em}%
-  \\hspace*{0.6em}{\\color{indigo}\\rule{0.92\\paperwidth}{1.2pt}}%
-  \\vspace*{0.3em}%
+// Build a Slidev presenter-note block if notes are present.
+function maybeNotes(item) {
+  const notes = getField(item, 'notes');
+  if (!notes) return '';
+  return `\n<!--\n${notes}\n-->\n`;
 }
 
-% Listings — dark panel, indigo-bordered code blocks
-\\lstset{
-  basicstyle=\\ttfamily\\footnotesize\\color{slatefg},
-  backgroundcolor=\\color{slatepanel},
-  frame=single,
-  rulecolor=\\color{indigo},
-  framesep=4pt,
-  breaklines=true,
-  columns=flexible,
-  xleftmargin=0pt,
-  xrightmargin=0pt,
-  showstringspaces=false,
-}
-
-\\title{${docTitle}}
-${subtitle}
-`;
-}
-
-// ─── per-layout renderers (return string) ──────────────────────────────────
-
+// Bullet list from string array → markdown unordered list.
 function bulletList(items) {
   if (!items || items.length === 0) return '';
-  const lines = items.map((b) => `  \\item ${texEscape(b)}`).join('\n');
-  return `\\begin{itemize}\n${lines}\n\\end{itemize}\n`;
+  return items.map((b) => `- ${b}`).join('\n') + '\n';
 }
 
-function maybeNote(item) {
-  const notes = item && item.fields && typeof item.fields.get === 'function'
-    ? item.fields.get('notes')
-    : null;
-  if (!notes) return '';
-  return `\\note{${texEscape(notes)}}\n`;
+// Numbered list from string array.
+function numberedList(items) {
+  if (!items || items.length === 0) return '';
+  return items.map((b, i) => `${i + 1}. ${b}`).join('\n') + '\n';
 }
+
+// Extract language hint from a fenced code field value.
+// Field stores e.g. "```python\n...\n```" or "```\n...\n```"
+function parseCodeField(codeField) {
+  if (!codeField) return { lang: '', body: '' };
+  const m = /^```([^\n]*)\n([\s\S]*?)```\s*$/.exec(codeField.trim());
+  if (m) return { lang: m[1].trim(), body: m[2] };
+  // bare body without fences
+  return { lang: '', body: codeField };
+}
+
+// ─── per-layout renderers (return slide body string, NO leading ---) ───────
+// Each returns the content between two --- separators. The separator itself
+// is added by the main loop.
 
 function renderTitle(item, parsed) {
   const fm = parsed.frontmatter || {};
-  const tagline = item.fields.get('tagline');
-  const mainTitle = texEscape(fm.title || splitBoldTitle(item.text).title);
-  const meta = [fm.course, fm.term].filter(Boolean).map(texEscape).join(' \\textperiodcentered\\ ');
-  const taglineBlock = tagline
-    ? `\\vspace{0.6em}\n{\\color{indigo}\\itshape\\large ${texEscape(tagline)}}\\par\n`
-    : '';
-  const metaBlock = meta
-    ? `\\vfill\n{\\color{slatemuted}\\small ${meta}}\\par\n`
-    : '';
-  return `\\begin{frame}[plain]
-\\centering
-\\vspace*{0.8em}
-{\\color{indigo}\\bfseries\\Huge ${mainTitle}}\\par
-\\vspace{0.4em}
-{\\color{indigo}\\rule{0.7\\paperwidth}{1.5pt}}\\par
-${taglineBlock}${metaBlock}\\end{frame}
-${maybeNote(item)}`;
-}
-
-function frameWithBullets(title, item, opts = {}) {
-  const titleEsc = texEscape(opts.titleOverride || title || '');
-  const bullets = childTexts(item);
-  const breaks = opts.allowBreaks ? '[allowframebreaks]' : '';
-  return `\\begin{frame}${breaks}{${titleEsc}}
-${bulletList(bullets)}\\end{frame}
-${maybeNote(item)}`;
+  const { title: itemTitle } = splitBoldTitle(item.text);
+  const title = fm.title || itemTitle;
+  const tagline = getField(item, 'tagline');
+  const lines = [`# ${title}`];
+  if (tagline) lines.push('', tagline);
+  lines.push('');
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderAgenda(item) {
   const { title } = splitBoldTitle(item.text);
-  return frameWithBullets(title || 'Today', item);
+  const bullets = childTexts(item);
+  const lines = [`## ${title || 'Today'}`, ''];
+  if (bullets.length > 0) lines.push(numberedList(bullets));
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderConcept(item, titleOverride) {
-  const { title } = splitBoldTitle(item.text);
-  return frameWithBullets(title, item, { titleOverride });
+  const { title: rawTitle } = splitBoldTitle(item.text);
+  const title = titleOverride || rawTitle;
+  const bullets = childTexts(item);
+  const lines = [`## ${title}`, ''];
+  if (bullets.length > 0) lines.push(bulletList(bullets));
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderSplit(item) {
@@ -211,134 +122,113 @@ function renderSplit(item) {
   const half = Math.ceil(bullets.length / 2);
   const left = bullets.slice(0, half);
   const right = bullets.slice(half);
-  return `\\begin{frame}{${texEscape(title)}}
-\\begin{columns}[T,onlytextwidth]
-\\begin{column}{0.48\\textwidth}
-${bulletList(left)}\\end{column}
-\\begin{column}{0.48\\textwidth}
-${bulletList(right)}\\end{column}
-\\end{columns}
-\\end{frame}
-${maybeNote(item)}`;
+  const lines = [`## ${title}`, ''];
+  if (left.length > 0) lines.push(bulletList(left));
+  lines.push('::right::', '');
+  if (right.length > 0) lines.push(bulletList(right));
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderCode(item) {
   const { title } = splitBoldTitle(item.text);
-  const code = childTexts(item).join('\n');
-  // listings consumes raw code — no tex-escape inside lstlisting
-  return `\\begin{frame}[fragile]{${texEscape(title)}}
-\\begin{lstlisting}
-${code}
-\\end{lstlisting}
-\\end{frame}
-${maybeNote(item)}`;
+  const codeField = getField(item, 'code');
+  const { lang, body } = parseCodeField(codeField);
+  const fence = '```' + (lang || '');
+  const lines = [`## ${title}`, '', fence, body.trimEnd(), '```', ''];
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderDiagram(item) {
-  const { title, rest } = splitBoldTitle(item.text);
-  const alt = item.fields.get('alt') || rest || '';
-  return `\\begin{frame}{${texEscape(title)}}
-\\centering
-\\vspace{0.6em}
-\\fbox{\\begin{minipage}[c][3.6cm][c]{0.82\\textwidth}\\centering{\\color{slatemuted}\\itshape\\large Diagram: ${texEscape(alt)}}\\end{minipage}}
-\\end{frame}
-${maybeNote(item)}`;
+  const { title } = splitBoldTitle(item.text);
+  const alt = getField(item, 'alt') || '';
+  const bullets = childTexts(item);
+  // Emit the Schematic component tag for future theme support.
+  // Escape any double-quotes in alt text for the attribute.
+  const escapedAlt = alt.replace(/"/g, '&quot;');
+  const lines = [`## ${title}`, '', `<Schematic alt="${escapedAlt}" />`, ''];
+  if (bullets.length > 0) {
+    lines.push('');
+    lines.push(bulletList(bullets));
+  }
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderVocab(item) {
+  // vocab is not in the new layout map spec but keep it working — render
+  // as a split with definition pairs.
   const { title } = splitBoldTitle(item.text);
   const pairs = childTexts(item);
   const half = Math.ceil(pairs.length / 2);
   const left = pairs.slice(0, half);
   const right = pairs.slice(half);
-  // Render each pair as "term — definition" — children are typically
-  // "**term** — def" already; let texEscape handle markdown bold by stripping
-  // the surrounding stars to \textbf.
-  const fmt = (line) => {
-    const m = /^\*\*(.+?)\*\*\s*(.*)$/s.exec(line || '');
-    if (m) return `\\textbf{${texEscape(m[1])}} ${texEscape(m[2])}`;
-    return texEscape(line);
-  };
-  const fmtList = (arr) => {
-    if (arr.length === 0) return '';
-    return `\\begin{itemize}\n${arr.map((l) => `  \\item ${fmt(l)}`).join('\n')}\n\\end{itemize}\n`;
-  };
-  return `\\begin{frame}{${texEscape(title)}}
-\\begin{columns}[T,onlytextwidth]
-\\begin{column}{0.48\\textwidth}
-${fmtList(left)}\\end{column}
-\\begin{column}{0.48\\textwidth}
-${fmtList(right)}\\end{column}
-\\end{columns}
-\\end{frame}
-${maybeNote(item)}`;
+  const lines = [`## ${title}`, ''];
+  if (left.length > 0) lines.push(bulletList(left));
+  lines.push('::right::', '');
+  if (right.length > 0) lines.push(bulletList(right));
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderCaseStudy(item) {
-  const { title, rest } = splitBoldTitle(item.text);
+  const { title } = splitBoldTitle(item.text);
   const bullets = childTexts(item);
-  const cite = item.fields.get('citation');
-  const body = bullets.length > 0
-    ? bulletList(bullets)
-    : (rest ? `${texEscape(rest)}\\par\n` : '');
-  const footer = cite
-    ? `\\vfill\n{\\color{slatemuted}\\itshape\\small\\hfill Source: ${texEscape(cite)}}\\par\n`
-    : '';
-  return `\\begin{frame}{${texEscape(title)}}
-${body}${footer}\\end{frame}
-${maybeNote(item)}`;
+  const citation = getField(item, 'citation');
+  // Build EventChain steps from children. Each step is a JSON string.
+  const stepsJson = JSON.stringify(bullets);
+  const lines = [`## ${title}`, ''];
+  lines.push(`<EventChain :steps='${stepsJson}' />`);
+  lines.push('');
+  if (citation) {
+    lines.push(`*Source: ${citation}*`, '');
+  }
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderKey(item) {
   const { title } = splitBoldTitle(item.text);
-  return `\\begin{frame}[plain]
-\\centering
-\\vspace*{0.4em}
-{\\color{amber}\\bfseries\\large KEY}\\par
-\\vspace{0.2em}
-{\\color{amber}\\rule{0.5\\paperwidth}{1.2pt}}\\par
-\\vspace{1.2em}
-\\begin{minipage}{0.86\\textwidth}\\centering
-{\\color{slatefg}\\bfseries\\LARGE ${texEscape(title)}}
-\\end{minipage}
-\\vfill
-\\end{frame}
-${maybeNote(item)}`;
+  const lines = [`# ${title}`, ''];
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderSummary(item) {
   const { title, rest } = splitBoldTitle(item.text);
   const bullets = childTexts(item);
+  const lines = [`## ${title || 'Summary'}`, ''];
   if (bullets.length > 0) {
-    return `\\begin{frame}{Summary}
-${bulletList(bullets)}\\end{frame}
-${maybeNote(item)}`;
+    lines.push(bulletList(bullets));
+  } else if (rest) {
+    lines.push(rest, '');
   }
-  const sentence = rest || title || '';
-  return `\\begin{frame}{Summary}
-\\vspace{0.4em}
-\\begin{minipage}{0.92\\textwidth}
-{\\color{slatefg}\\large ${texEscape(sentence)}}
-\\end{minipage}
-\\end{frame}
-${maybeNote(item)}`;
+  return lines.join('\n') + maybeNotes(item);
 }
 
 function renderSectionDivider(item) {
   const { title } = splitBoldTitle(item.text);
-  // Drive Beamer's \section so the navigation tree stays sensible.
-  return `\\section{${texEscape(title)}}
-\\begin{frame}[plain]
-\\hspace*{0.04\\paperwidth}{\\color{indigo}\\rule{0.4em}{0.7\\paperheight}}\\hfill%
-\\begin{minipage}[c][0.7\\paperheight][c]{0.82\\paperwidth}
-\\centering
-{\\color{slatefg}\\bfseries\\Huge ${texEscape(title)}}
-\\end{minipage}%
-\\end{frame}
-${maybeNote(item)}`;
+  const lines = [`# ${title}`, ''];
+  return lines.join('\n') + maybeNotes(item);
 }
 
-// ─── main ──────────────────────────────────────────────────────────────────
+function renderBlank(item) {
+  const { title } = splitBoldTitle(item.text);
+  const lines = [`# ${title}`, ''];
+  return lines.join('\n') + maybeNotes(item);
+}
+
+// ─── per-layout headmatter (returns object of extra front-matter keys) ─────
+// Returns null if no extra headmatter needed (use default layout).
+
+function slidevLayout(layout) {
+  switch (layout) {
+    case 'title': return 'cover';
+    case 'split': return 'two-cols';
+    case 'vocab': return 'two-cols';
+    case 'key': return 'center';
+    case 'section-divider': return 'center';
+    case 'blank': return 'center';
+    default: return null; // default Slidev layout
+  }
+}
+
+// ─── main content renderer ─────────────────────────────────────────────────
 
 function renderEntry(entry, parsed) {
   const { item, layout, titleOverride } = entry;
@@ -353,18 +243,28 @@ function renderEntry(entry, parsed) {
     case 'key': return renderKey(item);
     case 'summary': return renderSummary(item);
     case 'section-divider': return renderSectionDivider(item);
+    case 'blank': return renderBlank(item);
     case 'concept':
     default:
       return renderConcept(item, titleOverride);
   }
 }
 
+// ─── export ────────────────────────────────────────────────────────────────
+
 export async function generateSlides(parsed, options = {}) {
   const slides = applyTermFilter(parsed.byRole.get('slide') || [], options);
   const outputDir = options.outputDir || process.cwd();
   const slug = parsed.frontmatter.topicSlug || 'deck';
-  const filename = `${slug}_slides.tex`;
+  const filename = `${slug}_slides.md`;
   const filePath = path.join(outputDir, filename);
+
+  // Theme selection
+  const courseNum = String(parsed.frontmatter.course || '').split(/\s+/).pop();
+  const themeName = COURSE_THEME[courseNum] || 'blueprint';
+  // Resolve absolute path from this generator's location so the deck can
+  // be built from any cwd — Slidev resolves local themes by path, not name.
+  const themePath = path.resolve(__dirname, '..', 'themes', themeName);
 
   const warnings = [];
 
@@ -409,7 +309,7 @@ export async function generateSlides(parsed, options = {}) {
     }
   }
 
-  // Humanize warnings.
+  // Pacing lint warnings.
   let run = 1;
   for (let i = 1; i < expanded.length; i++) {
     if (expanded[i].layout === expanded[i - 1].layout) {
@@ -437,7 +337,7 @@ export async function generateSlides(parsed, options = {}) {
       slideNumber: null,
     });
   }
-  // Soft note (not a humanize warning per acceptance criteria).
+  // Soft note: title slide missing tagline.
   const titleSlide = slides.find((s) => s.fields.get('layout') === 'title');
   if (titleSlide && !titleSlide.fields.get('tagline')) {
     warnings.push({
@@ -446,37 +346,54 @@ export async function generateSlides(parsed, options = {}) {
     });
   }
 
-  // Build .tex
-  const preamble = buildPreamble(parsed);
-  const frames = expanded.map((entry) => renderEntry(entry, parsed)).join('\n');
-  const tex = `${preamble}
-\\begin{document}
+  // Build Slidev deck markdown.
+  const fm = parsed.frontmatter || {};
+  const deckTitle = fm.title || slug;
+  const infoLine = `CECS ${courseNum} — generated by lecture-materials-assistant`;
 
-${frames}
+  // Global headmatter (the deck-level frontmatter).
+  const headmatter = [
+    '---',
+    `theme: ${themePath}`,
+    `title: ${deckTitle}`,
+    `info: ${infoLine}`,
+    'class: text-left',
+    'drawings:',
+    '  persist: false',
+    '---',
+  ].join('\n');
 
-\\end{document}
-`;
+  // Build slide sections.
+  const slideParts = [];
+  for (const entry of expanded) {
+    const { layout } = entry;
+    const slidevLyt = slidevLayout(layout);
 
-  fs.mkdirSync(outputDir, { recursive: true });
-  fs.writeFileSync(filePath, tex, 'utf8');
+    // Per-slide headmatter (only when non-default layout needed).
+    const slideHead = slidevLyt ? `layout: ${slidevLyt}\n---` : null;
 
-  // Compile to PDF (twice — TOC/refs) unless caller opts out.
-  if (!options.noPdf) {
-    try {
-      compileLatex(filePath, outputDir);
-    } catch (err) {
-      warnings.push({
-        message: `pdflatex failed: ${err.message}`,
-        slideNumber: null,
-      });
+    // Render slide content body.
+    const body = renderEntry(entry, parsed);
+
+    if (slideHead) {
+      slideParts.push(`---\n${slideHead}\n\n${body}`);
+    } else {
+      slideParts.push(`---\n\n${body}`);
     }
   }
+
+  // Join: headmatter + each slide section (each already starts with ---).
+  const deck = headmatter + '\n\n' + slideParts.join('\n') + '\n';
+
+  fs.mkdirSync(outputDir, { recursive: true });
+  fs.writeFileSync(filePath, deck, 'utf8');
 
   return {
     filename,
     path: filePath,
     warnings,
     slideCount: expanded.length,
+    theme: themeName,
   };
 }
 
