@@ -221,8 +221,8 @@ Cornell handout in some form. Do not leave major visual concepts slide-only.
 
 ### Diagram Representation in PDF Artifacts
 
-The `docx` npm package cannot render vector diagrams. Use structured tables and
-bordered text boxes to approximate diagrams:
+When a true vector diagram isn't practical in a given artifact, approximate it with
+structured tables and bordered text boxes:
 
 | Concept | Representation |
 |---|---|

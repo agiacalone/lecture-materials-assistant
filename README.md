@@ -1,264 +1,186 @@
 # lecture-materials-assistant
 
-A [Claude Code](https://claude.ai/code) skill and reusable generator toolchain for
-production-ready lecture materials for university CS courses.
+A [Claude Code](https://claude.ai/code) skill **and** a standalone Node.js generator
+toolchain that turns **one tagged-Markdown lecture source** into a full set of
+production-ready course materials for university CS courses — lecture notes, a
+student Cornell handout, study questions, a pop quiz, a question bank, a slide deck,
+a GitHub Classroom assignment README, and reading-list study guides.
 
-Student-facing lecture materials are intentionally partial replacements for
-distributing slides. They should carry roughly 40% of slide content and omit key
-elements so students still need to attend lecture.
-Printed student handouts and instructor lecture notes should also use color
-intentionally so both documents are easy to navigate at a glance during a live lecture.
+Everything is **100% open formats, end to end**: Markdown in; Markdown, LaTeX→PDF,
+and [Slidev](https://sli.dev) decks out. No proprietary or binary "source" formats
+anywhere in the pipeline.
 
-This repo now contains the stable JavaScript generators directly. In a course repo,
-Claude should gather topic and content, write or update a lecture spec JSON, and use
-the checked-in generator scripts to produce the lecture materials.
+> **Companion project:** [lectern](https://github.com/agiacalone/lectern) is the
+> course-*operations* counterpart (term lifecycle, gradebook, exam build/verify with
+> per-student serials, GitHub-Actions autograding). This repo produces *content*;
+> lectern runs the *course*.
 
-## Current Status
+---
 
-The end-to-end workflow is working:
-- freeform or structured request -> lecture spec JSON
-- lecture spec JSON -> compiled lecture documents
+## The idea in one minute
 
-It has been exercised successfully with a `Virtual Memory and Paging` example.
+You maintain a single source of truth per lecture — `<topic>_lecture_main.md` — a
+plain Markdown file with YAML frontmatter and lightweight inline tags. **Every other
+artifact is a projection of that file.** Change the source, re-run the generator, and
+the whole set regenerates consistently.
 
-Current limitation: the prompt parser still needs refinement. It produces usable
-specs, but some extracted fields and generated phrasing still need cleanup before
-the outputs should be treated as production-ready without review.
+Two design principles drive the output:
 
-## What It Generates
+- **Living notes — kept vs. disposable.** The `_lecture_main.md` and the append-only
+  `_question_bank.md` are *kept* (you edit them, they persist across semesters).
+  Everything else — handouts, slides, quizzes, study guides — is *disposable* and
+  regenerated fresh from the source each term. You never hand-edit a PDF.
+- **Student materials are intentionally partial.** Handouts carry roughly **40% of
+  the slide content** and leave key elements blank, so the handout complements
+  attending lecture instead of replacing it. Printed materials use **color as a
+  functional navigation cue** (each section kind gets its own banner/cue tint), so a
+  page is easy to scan at a glance during a live lecture.
 
-| Artifact | Format | Description |
-|---|---|---|
-| Lecture notes | `.docx` | Instructor copy with speaker notes, timing, and callout boxes |
-| Cornell handout | `.docx` | Pre-distributed guided notes with roughly 40% slide coverage; students fill omitted key elements from projected slides |
-| Study questions | `.docx` | 10 tiered questions (Recall / Apply / Analyze) that reinforce lecture rather than restate slides |
-| Pop quiz | `.docx` | 5-question in-class quiz with instructor answer key |
-| Slide deck | `.pptx` | 14–18 slides, CS Modern dark slate theme |
-| GitHub README | `.md` | GitHub Classroom assignment (reading or lab variant) |
-| Question bank | `.md` | Persistent tagged question pool (mc / tf / code / fib / sa) |
-| Exam | `.pdf` + `.tex` | Assembled from question bank(s); produces student and key versions |
+---
 
-## Installation
+## What it generates
 
-Choose the platform path that matches your Claude Code machine.
+Run against the bundled sample (`examples/file_systems_abstraction_lecture_main.md`):
 
-### macOS
+| Artifact | `--artifact` | Output | Needs LaTeX? |
+|---|---|---|---|
+| Instructor lecture notes | `lecture-notes` | `.tex` → `.pdf` | yes |
+| Cornell student handout | `cornell` | `.tex` → `.pdf` | yes |
+| Pop quiz + answer key | `quiz` | `.tex` → `.pdf` (×2) | yes |
+| Study questions | `study-questions` | `.md` | no |
+| Question bank (append-only) | `bank` | `.md` | no |
+| Slide deck | `slides` | `.md` (Slidev) | no |
+| GitHub Classroom README | `readme` | `.md` | no |
+| Reading-list companion | `reading-list` | `.md` | no |
+| Consistency audit | `audit` | console report | no |
 
-Install the base tools:
+Printed artifacts (`lecture-notes`, `cornell`, `quiz`) compile to PDF with
+`pdflatex`. Pass `--no-pdf` to emit the `.tex` and skip compilation if you don't have
+a LaTeX toolchain installed. The slide deck is Slidev Markdown — preview it live with
+`npm run slides:dev` or export with `npm run slides:build`.
 
-```bash
-brew install git node
-```
+> **Exams are not generated here.** Exams are controlled documents built by lectern's
+> `reg-exam-build` (per-student serials, register, verify). This toolchain produces
+> the *question bank* that exam assembly draws from. See the
+> [Exam reading-list](#exam-reading-list-multi-topic-study-guide) section for the
+> per-exam *study guide*, which this repo does produce.
 
-For exam PDF generation, install a LaTeX distribution:
+---
 
-```bash
-brew install --cask mactex-no-gui
-
-# or a smaller install
-brew install basictex
-sudo tlmgr install enumitem listings geometry
-```
-
-### Fedora Server
-
-Install the base tools:
-
-```bash
-sudo dnf install -y git nodejs npm
-```
-
-For exam PDF generation, install LaTeX:
-
-```bash
-sudo dnf install -y texlive-scheme-basic texlive-enumitem texlive-listings texlive-geometry
-```
-
-### Fedora Kinoite with Distrobox
-
-Install and use the skill inside your Distrobox container rather than on the immutable host.
-
-Create a container if needed:
+## Quick start
 
 ```bash
-distrobox create --name lecture-materials-assistant --image fedora:latest
+git clone https://github.com/agiacalone/lecture-materials-assistant.git
+cd lecture-materials-assistant
+npm install
+
+# Compile the full set from the bundled sample, skipping PDF compilation:
+node generate.js --main examples/file_systems_abstraction_lecture_main.md --no-pdf --out ./out
+
+# Or one artifact at a time:
+node generate.js --main examples/file_systems_abstraction_lecture_main.md --artifact slides --out ./out
+node generate.js --main examples/file_systems_abstraction_lecture_main.md --artifact cornell --out ./out
 ```
 
-Enter the container and install the base tools:
+See [`examples/README.md`](examples/README.md) for the per-artifact walkthrough.
 
-```bash
-distrobox enter lecture-materials-assistant
-sudo dnf install -y git nodejs npm
+---
+
+## The source file: `<topic>_lecture_main.md`
+
+This is the only file you author. It's ordinary Markdown with three layers of
+structure that the parser reads:
+
+**1. YAML frontmatter** — course context the generators need:
+
+```yaml
+---
+title: File Systems — Abstraction and Naming
+course: CECS 326
+topic-slug: file_systems_abstraction
+term: sp26
+adversarial-thinking: false   # set true for Security courses → adds attacker-mindset questions
+---
 ```
 
-For exam PDF generation inside the container:
+**2. Obsidian-style tags** on list items and headings — these mark *what each piece
+is*, so the right generator can pick it up:
 
-```bash
-sudo dnf install -y texlive-scheme-basic texlive-enumitem texlive-listings texlive-geometry
-```
+| Tag | Meaning |
+|---|---|
+| `#objective` | a learning objective |
+| `#vocab` | a vocabulary term (term + definition) |
+| `#concept` | a core idea |
+| `#blank` | a fill-in target on the student handout — **must** carry `[slide:: N]` |
+| `#slide` | a slide in the deck — carries a `[layout:: …]` from the layout enum |
+| `#question` | a bank/quiz question — typed `#type/mc`, `#type/sa`, etc. and `#difficulty/1..3` |
+| `#self-quiz` | a self-check question for the reading-list/study guide |
 
-### Ubuntu / Debian
+**3. Dataview-style inline fields** — `[key:: value]` pairs that attach data to a
+tagged item, e.g. `[slide:: 6]` (which slide a blank is answered on),
+`[citation:: Tanenbaum 4.2]` (textbook source for a reading list), `[answer:: B]`
+(the key for a multiple-choice question), `[layout:: two-cols]` (slide layout).
 
-Install the base tools:
+The parser validates the source before generating: a `#blank` without `[slide::]`, a
+multiple-choice `#question` without `[answer::]`, an unknown slide layout, or a
+diagram block missing `[alt::]` (ADA) all abort with a clear message *before* any
+file is written. The full tag taxonomy and validation rules live in
+[`references/style-guide.md`](references/style-guide.md).
 
-```bash
-sudo apt update
-sudo apt install -y git nodejs npm
-```
+---
 
-For exam PDF generation, install LaTeX:
+## Two ways to use it
 
-```bash
-sudo apt install -y texlive-latex-base texlive-latex-recommended texlive-latex-extra
-```
+### As a Claude Code skill (recommended)
 
-### Skill Setup
-
-**1. Install the skill into Claude's skills directory:**
+Installed as a skill, Claude does the authoring for you: you describe a lecture in
+plain English, Claude writes or edits the `_lecture_main.md` to match the style
+guide, then runs the generator. It does **not** rewrite the generator code — the
+checked-in JavaScript is the stable engine; the skill is the interface.
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone <this-repo> ~/.claude/skills/lecture-materials-assistant
+git clone https://github.com/agiacalone/lecture-materials-assistant.git \
+  ~/.claude/skills/lecture-materials-assistant
 ```
 
-**2. In your course repo, create `CLAUDE.md` from the example template:**
+In your course repo, copy the context template and reference the skill:
 
 ```bash
 cp ~/.claude/skills/lecture-materials-assistant/CLAUDE.md.example ./CLAUDE.md
 ```
 
-Fill in the five course context fields in `CLAUDE.md`.
-
-**3. Reference the installed skill from your course repo's `CLAUDE.md`:**
-
 ```markdown
 ## Skills
-- Use the lecture-materials-assistant skill at ~/.claude/skills/lecture-materials-assistant/SKILL.md
-  for all lecture content generation requests.
+- Use the lecture-materials-assistant skill at
+  ~/.claude/skills/lecture-materials-assistant/SKILL.md for all lecture content.
 ```
 
-## Dependencies
+Then just ask:
 
-Install the JS dependencies once in this repo:
+> Generate lecture materials for **virtual memory and paging** in CECS 326. Cover the
+> virtual address space, page-table translation, the TLB, and thrashing. ~75 minutes.
 
-```bash
-npm install
-```
+### As a plain CLI
 
-Manual equivalent:
+You can author the `_lecture_main.md` by hand and drive the generator directly — no
+Claude required. Every artifact is a `node generate.js --main <file> --artifact <name>`
+call (see the table above). This is what the [Quick start](#quick-start) shows.
 
-```bash
-npm install docx pptxgenjs
-npm install markdown-it
-```
+---
 
-## Course Context
+## Generating a question bank
 
-Before generating, provide these five fields in your initial prompt or in
-`CLAUDE.md` when they matter for the requested artifact:
-
-| Field | Example |
-|---|---|
-| Course code + name | `CECS 326 — Operating Systems` |
-| Student level | `Upper-division CS majors; strong C/systems background` |
-| Lecture length | `~75 minutes` |
-| Assessment format | `GitHub Classroom (Markdown), in-class activities` |
-| Adversarial thinking | `yes` (Security courses) / `no` (default) |
-
-`Adversarial thinking` defaults to `no`, so it should not block generation by itself.
-
-## Usage
-
-Typical flow:
-
-1. Put the skill on Claude's path and reference it from your course repo's `CLAUDE.md`.
-2. Provide course context once.
-3. Ask Claude to generate or update a lecture spec JSON from your topic and content.
-4. Run the checked-in generator CLI with that spec.
-
-### Scaffolding a lecture spec
-
-You do not need to start from raw JSON. Use the included scaffold command:
-
-```bash
-node init-spec.js --prompt "Generate lecture materials for Virtual Memory and Paging in CECS 326 Operating Systems. Student level: upper-division CS majors. ~75 minutes. Cover: virtual address space, page table translation, TLB locality, page faults. Sections: Why virtual memory exists|Page translation and the TLB|Page faults and thrashing. Case studies: single-level page table overhead|thrashing under poor locality. Questions: When is a larger page size a net win?|How should an OS respond to thrashing?"
-```
-
-Or use explicit flags:
-
-```bash
-node init-spec.js \
-  --topic "Virtual Memory and Paging" \
-  --course-code "CECS 326" \
-  --course-name "Operating Systems" \
-  --student-level "Upper-division CS majors with systems background" \
-  --minutes 75 \
-  --concepts "virtual address space|page table translation|TLB locality|page faults" \
-  --sections "Why virtual memory exists|Page translation and the TLB|Page faults and thrashing" \
-  --questions "When is a larger page size a net win?|How should an OS respond to thrashing?"
-```
-
-That produces a starter spec JSON which Claude can then refine before generation.
-
-### Generating lecture materials
-
-> Generate lecture materials for [TOPIC] in [COURSE]. Cover: [KEY CONCEPTS]. Case studies: [EXAMPLES]. ~[N] minutes.
-
-The skill should not regenerate JavaScript source on each run. It should use the
-existing generator code in this repo and feed it a structured config file.
-
-```
-generate.js              # CLI orchestrator for the standard lecture set
-examples/
-  file_systems_abstraction_lecture_main.md   # self-contained sample source
-  README.md                                   # how to compile the sample
-parser/                  # tagged-Markdown → validated lecture model
-lib/                     # shared LaTeX preamble + Cornell palette helpers
-generators/
-  lecture-notes.js
-  cornell-handout.js
-  study-questions.js
-  quiz.js
-  readme.js
-  slides.js
-  question-bank.js
-  exam.js
-```
-
-Run the standard lecture set at once, or generate a single artifact, against the
-bundled sample (see [`examples/README.md`](examples/README.md)):
-
-```bash
-npm install
-node generate.js --main examples/file_systems_abstraction_lecture_main.md --no-pdf --out ./out
-node generate.js --main examples/file_systems_abstraction_lecture_main.md --artifact slides --out ./out
-node generate.js --main examples/file_systems_abstraction_lecture_main.md --artifact cornell --out ./out
-```
-
-### Generating a question bank
-
-> Generate a question bank for [TOPIC] in [COURSE]. Sessions covered: [SUBTOPIC 1], [SUBTOPIC 2], [SUBTOPIC 3].
-
-Question banks are topic-wide and append-only. Claude should read the existing bank
-first, avoid duplicates, and assign the next sequence number per question type.
+Question banks are topic-wide and **append-only** — the persistent pool that exam
+assembly (in lectern) later draws from. The generator reads the existing bank, avoids
+duplicates, and assigns the next sequence number per question type (`m01`, `m02`, …
+for multiple choice; `t01…` true/false; `s01…` short answer; etc.).
 
 ```bash
 node generate.js --main examples/file_systems_abstraction_lecture_main.md --artifact bank --out ./out
 ```
 
-### Assembling an exam
-
-> Assemble an exam for [COURSE] [TERM], Exam [N], [X] pts. Draw from: [bank1.md], [bank2.md]. MC: 20 questions × 2 pts. Essay: 2 questions × 5 pts. Difficulty: ★ 40%, ★★ 35%, ★★★ 25%. Randomize: yes.
-
-Exam assembly reads 2–3 bank files, weights question selection by topic coverage if
-needed, writes `[course_num]-exam-[n]-[term].tex`, compiles the student PDF, then
-toggles `\answerstrue` and recompiles to produce the key PDF.
-
-```bash
-node generate.js exam --spec ./your-exam-spec.json --out ./out
-```
-
-### Exam reading-list (multi-topic study guide)
+## Exam reading-list (multi-topic study guide)
 
 A consolidated, per-exam study guide that maps each covered handout's cues to where
 the answer lives in the assigned reading — the multi-topic companion to the
@@ -278,18 +200,67 @@ Pass several comma-separated `--mains` to fold multiple topics into one guide
 (rendered as Part A, Part B, …). Optional `--textbook`, `--citation-key`, `--note`,
 and `--note-title` override the source-block defaults (Tanenbaum & Bos for OS courses).
 
-## References
+---
 
-- `examples/lecture-spec.json` — sample structured lecture input
-- `init-spec.js` — scaffold a lecture spec from prompt-like inputs
-- `references/style-guide.md` — complete style specifications for all artifacts
-- `references/reference_exam.tex` — structural LaTeX template for exam generation
+## Installing prerequisites
 
-Generated code, generated course materials, and other outputs created by using this
-repository are owned by the user who generates them. Those outputs are not required
-to be licensed under this repository's license unless they copy substantial portions
-of this repository itself.
+You need **Node.js** (for all artifacts) and, for the printable PDFs, a **LaTeX**
+toolchain with `pdflatex` on your `PATH`. The Markdown and Slidev artifacts need
+neither beyond Node.
 
-## License
+| Platform | Base tools | LaTeX (for PDFs) |
+|---|---|---|
+| macOS | `brew install git node` | `brew install --cask mactex-no-gui` *(or `basictex` + `sudo tlmgr install enumitem listings geometry`)* |
+| Fedora | `sudo dnf install -y git nodejs npm` | `sudo dnf install -y texlive-scheme-basic texlive-enumitem texlive-listings texlive-geometry` |
+| Ubuntu / Debian | `sudo apt install -y git nodejs npm` | `sudo apt install -y texlive-latex-base texlive-latex-recommended texlive-latex-extra` |
 
-[MIT](LICENSE)
+On Fedora Atomic (Kinoite/Silverblue), install inside a `distrobox` container rather
+than layering onto the immutable host.
+
+Then, once per clone:
+
+```bash
+npm install
+```
+
+---
+
+## Repository layout
+
+```
+generate.js                 # CLI orchestrator: parse → validate → dispatch → (compile)
+exam-reading-list-cli.js    # sub-tool CLI: multi-topic per-exam study guide
+parser/
+  index.js                  # parse() + validate() entry points
+  main-parser.js            # Markdown + tag + inline-field walker
+  validators.js             # invariant checks; hard errors block generation
+generators/                 # one file per artifact (lecture-notes, cornell-handout,
+                            #   study-questions, quiz, question-bank, slides, readme,
+                            #   reading-list, exam-reading-list, audit)
+lib/                        # shared LaTeX preamble + Cornell palette helpers
+themes/                     # Slidev themes (blueprint, terminal)
+examples/                   # self-contained sample source + walkthrough
+references/
+  style-guide.md            # complete style + tag + validation specs — read this
+SKILL.md                    # skill metadata + workflow (entry point when used as a skill)
+CLAUDE.md.example           # template you copy into your course repo
+```
+
+---
+
+## Tests
+
+```bash
+npm test       # vitest — parser, validators, and every generator
+npm run check  # node --check syntax-validation across the live sources
+```
+
+---
+
+## License & ownership
+
+[MIT](LICENSE).
+
+Materials you generate with this toolchain are yours — they are not required to carry
+this repository's license unless they copy substantial portions of the repository
+itself.

@@ -36,10 +36,10 @@ priors, but the formats split into two tiers:
   - `<topic>_cornell_handout.pdf` (student)
   - `<topic>_study_questions.md` (student review)
   - `<topic>_quiz.pdf` + `<topic>_quiz_key.pdf`
-  - `<topic>_slides.tex` + `<topic>_slides.pdf` (Beamer)
+  - `<topic>_slides.md` (Slidev) — render/export with the `slides:dev` / `slides:build` scripts
   - `README.md` (GitHub Classroom)
-  - exam `.tex` + `.pdf` (assembled from banks; the kept form is the bank +
-    exam-spec.json)
+  - (exams are no longer produced here — built by lectern's `reg-exam-build` from the
+    question bank; this repo's kept form is the `_question_bank.md`)
 - **Archived (do not author new):**
   - `lecture-spec.json` and `init-spec.js` — the spec-driven path was archived
     on 2026-05-07 to `archive/spec-driven-2025/`. New work goes through the
@@ -95,11 +95,10 @@ lecture-materials-assistant/
 │   ├── file_systems_abstraction_lecture_main.md  # canonical example (self-contained)
 │   └── README.md                                 # how to compile the sample
 ├── exam-reading-list-cli.js       # sub-tool CLI: multi-topic per-exam reading list (driven by lectern reg-exam-readinglist)
-├── generators/                    # one file per artifact family (lecture-notes, cornell-handout, slides, quiz, study-questions, question-bank, exam, reading-list, exam-reading-list, readme)
+├── generators/                    # one file per artifact family (lecture-notes, cornell-handout, slides, quiz, study-questions, question-bank, reading-list, exam-reading-list, readme, audit)
 ├── lib/                           # shared LaTeX preamble + Cornell palette helpers
 ├── references/
-│   ├── style-guide.md             # Complete style specs — MUST read before generating
-│   └── reference_exam.tex         # Structural reference for LaTeX exam generation
+│   └── style-guide.md             # Complete style specs — MUST read before generating
 ├── archive/
 │   └── spec-driven-2025/          # historical: init-spec.js + lecture-spec.json (do not author new specs)
 └── assets/                        # Placeholder for course-specific assets
@@ -120,12 +119,14 @@ lecture-materials-assistant/
 - `node generate.js --main <path> --artifact bank` (alias: `question-bank`)
 - `node generate.js --main <path> --artifact reading-list`
 - `node generate.js --main <path> --out ./out --no-pdf` — override output dir, skip pdflatex
-- `node generate.js exam --spec ./exam-spec.json --out .` — exam sub-command
 - `node exam-reading-list-cli.js --exam-name "Midterm 1" --slug midterm_1 --course "CECS 326" --term sp26 --mains a.md,b.md --out ./out` — **exam reading-list** sub-tool: consolidates several topic `_lecture_main.md` files into one per-exam cue→source study guide (`<slug>_reading_list.md`). Driven by lectern's `reg-exam-readinglist`. Accepts `--textbook`, `--citation-key`, `--note`, `--note-title` overrides.
 
-For exam generation, Claude still reads `references/reference_exam.tex` as a
-structural reference, but exam output is produced through the checked-in
-`generators/exam.js`.
+**Exam generation has moved out of this repo.** Exams are controlled documents owned
+by lectern: assemble a `.tex` from the topic's `*_question_bank.md`, then build
+per-student serialized copies with `reg-exam-build` and verify with `reg-exam-verify`.
+The `exam` artifact and the old `generate.js exam` sub-command now emit an error
+pointing at `reg-exam-build`. This repo still produces the *question bank* that exam
+assembly draws from, and the per-exam *reading-list* study guide.
 
 ## Output Artifacts
 
@@ -136,13 +137,14 @@ structural reference, but exam output is produced through the checked-in
 | `[topic]_cornell_handout.pdf` | Student handout | 2-col Cornell layout, ~40% slide-content coverage, section-kind colors (motivation=teal / concept=navy / synthesis=amber / strategy=indigo / application=green / case-study=purple / pitfall=rose) anchor each section's banner, cue-tint, and KEY callout; `.tex` retained |
 | `[topic]_study_questions.md` | Study questions | 10 questions: 2 Recall, 3 Apply, 5 Analyze; Markdown only — no print form generated |
 | `[topic]_quiz.pdf` + `[topic]_quiz_key.pdf` | Pop quiz | 5 questions (~10 min), MC+short answer, separate key PDF; `.tex` retained |
-| `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly |
-| `[course_num]-exam-[n]-[term].pdf` | Exam | Assembled from bank(s), compiled to PDF via pdflatex; `.tex` source retained alongside; generator toggles `\answerstrue` and recompiles for the key |
+| `[topic]_question_bank.md` | Question bank | ~50 tagged questions (mc/tf/code/fib/sa · ★/★★/★★★ · subtopic); source of truth for exam assembly (in lectern) |
 | `[topic]_reading_list.md` *or* `[scope]_reading_list.md` | Reading-list companion | Hybrid scaffold paired 1:1 (or 1:N) with Cornell handout(s). Generator emits cue-table rows inside `<!-- generator: cue-tables -->` … `<!-- /generator -->`; manual content (curated primary sources, References, instructor notes) outside the fence is preserved on regen. |
 | `README.md` | GitHub Classroom README | Rigid boilerplate — copy structure exactly |
-| `[topic]_slides.tex` + `[topic]_slides.pdf` | Slide deck (Beamer) | 14–18 slides, CS Modern dark slate theme, indigo frametitle accent stripe, slate `#0F172A` / indigo `#6366F1` / amber `#F59E0B` palette |
+| `[topic]_slides.md` | Slide deck (Slidev) | 14–18 slides; render live or export via the `slides:dev` / `slides:build` scripts. *(Slide styling is mid-migration — the Beamer-era palette notes below are being reworked.)* |
 
-The `.docx` and `.pptx` formats are no longer emitted. All printed handouts and the slide deck render to PDF via `pdflatex`.
+The `.docx` and `.pptx` formats are no longer emitted. Printed handouts (lecture
+notes, Cornell handout, quiz) render to PDF via `pdflatex`; the slide deck is Slidev
+Markdown. Exams are built by lectern, not here.
 
 ## Required npm/pip Dependencies (user installs once)
 
@@ -150,8 +152,9 @@ The `.docx` and `.pptx` formats are no longer emitted. All printed handouts and 
 npm install
 ```
 
-`pptxgenjs` and `docx` are no longer dependencies; the slides generator emits
-Beamer LaTeX, which `pdflatex` compiles directly.
+`pptxgenjs` and `docx` are no longer dependencies. The slides generator emits Slidev
+Markdown; the LaTeX artifacts (lecture notes, Cornell handout, quiz) compile to PDF
+via `pdflatex`.
 
 ## Preferred Skill Behavior
 
