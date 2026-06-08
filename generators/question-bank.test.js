@@ -11,23 +11,29 @@ describe('question-bank generator', () => {
     const md = generateQuestionBank(r);
     expect(md).toContain('# File Systems');
     expect(md).toContain('Question Bank');
-    // 18 questions in fixture → 18 ## headers under the title
+    // One ## block per question in the source. Derive the count from the parsed
+    // model so this doesn't go stale as the canonical lecture gains/loses
+    // questions (the fixture is the live CECS 326 lecture source).
+    const expected = r.byRole.get('question').length;
     const blocks = (md.match(/^## [mtcfs]\d{2}/gm) || []).length;
-    expect(blocks).toBe(18);
+    expect(blocks).toBe(expected);
   });
 
   it('numbers ids as <typeletter><nn>, padded, sequential within type', () => {
     const r = parse({ path: FIXTURE });
     const md = generateQuestionBank(r);
+    // Spot-checks of sequential zero-padded numbering within each type. The
+    // canonical fixture currently has 11 mc / 5 tf / 2 code / 6 sa / 3 fib;
+    // these assert mid-sequence ids exist, not the exact per-type totals.
     expect(md).toMatch(/## m01/);
-    expect(md).toMatch(/## m07/); // 7 mc questions
+    expect(md).toMatch(/## m07/);
     expect(md).toMatch(/## t01/);
-    expect(md).toMatch(/## t03/); // 3 tf questions
-    expect(md).toMatch(/## c01/); // 1 code question
+    expect(md).toMatch(/## t03/);
+    expect(md).toMatch(/## c01/);
     expect(md).toMatch(/## f01/);
-    expect(md).toMatch(/## f03/); // 3 fib questions
+    expect(md).toMatch(/## f03/);
     expect(md).toMatch(/## s01/);
-    expect(md).toMatch(/## s04/); // 4 sa questions
+    expect(md).toMatch(/## s04/);
   });
 
   it('emits options block for mc questions from child bullets', () => {
@@ -42,8 +48,9 @@ describe('question-bank generator', () => {
   it('emits answer line for every question', () => {
     const r = parse({ path: FIXTURE });
     const md = generateQuestionBank(r);
+    const expected = r.byRole.get('question').length;
     const answerCount = (md.match(/^- answer:/gm) || []).length;
-    expect(answerCount).toBe(18);
+    expect(answerCount).toBe(expected);
   });
 
   it('marks #type/fib questions as exam-eligible: false (validator already stripped)', () => {

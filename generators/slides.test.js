@@ -1,32 +1,24 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
-import path from 'node:path';
 import { parse } from '../parser/index.js';
 import { generateSlides } from './slides.js';
 
 const FIXTURE = 'examples/file_systems_abstraction_lecture_main.md';
 const OUT = '/tmp/lma-slides-test';
 
-describe('slides generator (Beamer)', () => {
-  it('writes a non-empty .tex + .pdf and reports slide count', async () => {
+describe('slides generator (Slidev)', () => {
+  it('writes a non-empty Slidev .md and reports slide count', async () => {
     fs.mkdirSync(OUT, { recursive: true });
     const r = parse({ path: FIXTURE });
-    const result = await generateSlides(r, { outputDir: OUT });
-    expect(result.filename).toBe('file_systems_abstraction_slides.tex');
+    const result = await generateSlides(r, { outputDir: OUT, noPdf: true });
+    expect(result.filename).toBe('file_systems_abstraction_slides.md');
     expect(fs.existsSync(result.path)).toBe(true);
-    const tex = fs.readFileSync(result.path, 'utf8');
-    expect(tex).toContain('\\documentclass[aspectratio=169,11pt]{beamer}');
-    expect(tex).toContain('\\begin{document}');
-    expect(tex).toContain('File Systems');
-    // .tex should contain one \begin{frame} per rendered slide
-    const frameCount = (tex.match(/\\begin\{frame\}/g) || []).length;
-    expect(frameCount).toBe(result.slideCount);
+    const md = fs.readFileSync(result.path, 'utf8');
+    // Slidev headmatter (theme + cover layout) and the deck title.
+    expect(md).toMatch(/^theme:/m);
+    expect(md).toMatch(/layout: cover/);
+    expect(md).toContain('File Systems');
     expect(result.slideCount).toBe(16);
-
-    // PDF compiled alongside the .tex
-    const pdfPath = path.join(OUT, 'file_systems_abstraction_slides.pdf');
-    expect(fs.existsSync(pdfPath)).toBe(true);
-    expect(fs.statSync(pdfPath).size).toBeGreaterThan(50000);
   });
 
   it('emits warnings array (may be empty)', async () => {

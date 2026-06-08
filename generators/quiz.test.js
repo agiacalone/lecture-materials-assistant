@@ -31,8 +31,36 @@ describe('quiz generator', () => {
   });
 
   it('includes Multiple Choice and Short Answer sections', () => {
-    const r = parse({ path: FIXTURE });
-    const result = generateQuiz(r);
+    // The canonical fixture's deterministic 5-pick happens to be all
+    // MC-section types, so the Short Answer section never renders from it.
+    // Use a small mixed source that forces the tier-picker to select an sa
+    // question (Tier 3 "analyze" = diff 3, type ∈ {sa, code}) so BOTH render.
+    const SRC = `---
+title: Mixed Quiz Fixture
+course: CECS 326
+term: sp26
+---
+## I. S
+### Bank
+- #question #type/mc #difficulty/1 #section/I [answer:: A]
+  Stem: mc-recall-1?
+  - A. ok
+  - B. no
+- #question #type/mc #difficulty/1 #section/I [answer:: B]
+  Stem: mc-recall-2?
+  - A. ok
+  - B. no
+- #question #type/mc #difficulty/2 #section/I [answer:: A]
+  Stem: mc-apply?
+  - A. ok
+  - B. no
+- #question #type/sa #difficulty/3 #section/I [answer:: model answer]
+  Stem: sa-analyze-this?
+- #question #type/code #difficulty/2 #section/I [answer:: 42]
+  Stem: code-q?
+`;
+    const r = parse({ source: SRC });
+    const result = generateQuiz(r, { silent: true });
     expect(result.quizTex).toMatch(/Multiple Choice/);
     expect(result.quizTex).toMatch(/Short Answer/);
   });
