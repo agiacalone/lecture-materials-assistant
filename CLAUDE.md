@@ -94,7 +94,8 @@ lecture-materials-assistant/
 ├── examples/
 │   ├── file_systems_abstraction_lecture_main.md  # canonical example (self-contained)
 │   └── README.md                                 # how to compile the sample
-├── generators/                    # one file per artifact family (lecture-notes, cornell-handout, slides, quiz, study-questions, question-bank, exam, reading-list, readme)
+├── exam-reading-list-cli.js       # sub-tool CLI: multi-topic per-exam reading list (driven by lectern reg-exam-readinglist)
+├── generators/                    # one file per artifact family (lecture-notes, cornell-handout, slides, quiz, study-questions, question-bank, exam, reading-list, exam-reading-list, readme)
 ├── lib/                           # shared LaTeX preamble + Cornell palette helpers
 ├── references/
 │   ├── style-guide.md             # Complete style specs — MUST read before generating
@@ -120,6 +121,7 @@ lecture-materials-assistant/
 - `node generate.js --main <path> --artifact reading-list`
 - `node generate.js --main <path> --out ./out --no-pdf` — override output dir, skip pdflatex
 - `node generate.js exam --spec ./exam-spec.json --out .` — exam sub-command
+- `node exam-reading-list-cli.js --exam-name "Midterm 1" --slug midterm_1 --course "CECS 326" --term sp26 --mains a.md,b.md --out ./out` — **exam reading-list** sub-tool: consolidates several topic `_lecture_main.md` files into one per-exam cue→source study guide (`<slug>_reading_list.md`). Driven by lectern's `reg-exam-readinglist`. Accepts `--textbook`, `--citation-key`, `--note`, `--note-title` overrides.
 
 For exam generation, Claude still reads `references/reference_exam.tex` as a
 structural reference, but exam output is produced through the checked-in

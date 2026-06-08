@@ -258,6 +258,26 @@ toggles `\answerstrue` and recompiles to produce the key PDF.
 node generate.js exam --spec ./your-exam-spec.json --out ./out
 ```
 
+### Exam reading-list (multi-topic study guide)
+
+A consolidated, per-exam study guide that maps each covered handout's cues to where
+the answer lives in the assigned reading — the multi-topic companion to the
+single-topic reading list. Driven by lectern's `reg-exam-readinglist`, but runnable
+directly: point it at the `_lecture_main.md` for every topic the exam covers.
+
+```bash
+node exam-reading-list-cli.js \
+  --exam-name "Midterm 1" --slug midterm_1 \
+  --course "CECS 326" --term sp26 \
+  --mains examples/file_systems_abstraction_lecture_main.md \
+  --out ./out
+# → ./out/midterm_1_reading_list.md
+```
+
+Pass several comma-separated `--mains` to fold multiple topics into one guide
+(rendered as Part A, Part B, …). Optional `--textbook`, `--citation-key`, `--note`,
+and `--note-title` override the source-block defaults (Tanenbaum & Bos for OS courses).
+
 ## References
 
 - `examples/lecture-spec.json` — sample structured lecture input
