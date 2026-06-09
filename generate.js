@@ -25,6 +25,9 @@ import { generateAudit } from './generators/audit.js';
 
 const require = createRequire(import.meta.url);
 const { compileLatex } = require('./lib/tex-helpers.js');
+const { projectColorPairs } = require('./lib/a11y/project-palette.js');
+const { auditColorPairs } = require('./lib/a11y/palette-audit.js');
+const { formatReport } = require('./lib/a11y/verify.js');
 
 const ARTIFACTS = new Set([
   'all',
@@ -65,6 +68,8 @@ Flags:
   --readme-variant <r|l>    \`reading\` (default) or \`lab\`
   --no-pdf                  skip pdflatex compilation
   --silent                  suppress info-level logs
+  --a11y-level <AA|AAA>     WCAG contrast target for the gate; default AA
+  --skip-a11y               bypass the ADA/WCAG contrast gate (not recommended)
 
 Semester filtering (applied to all role-based item lookups):
   --semester <term>         loose: keep #used/<term> + items with NO #used/* tag
@@ -90,10 +95,13 @@ function parseArgs(argv) {
     if (a === '--main' || a === '--artifact' || a === '--out' ||
         a === '--readme-variant' || a === '--spec' ||
         a === '--semester' || a === '--strict-semester' ||
-        a === '--mark-used' || a === '--current-term') {
+        a === '--mark-used' || a === '--current-term' ||
+        a === '--a11y-level') {
       args.flags[a.slice(2)] = argv[++i];
     } else if (a === '--no-pdf') {
       args.flags.noPdf = true;
+    } else if (a === '--skip-a11y') {
+      args.flags.skipA11y = true;
     } else if (a === '--silent') {
       args.flags.silent = true;
     } else if (a === '-h' || a === '--help') {
@@ -147,6 +155,20 @@ function reportWarnings(label, warnings, log) {
     const msg = typeof w === 'string' ? w : (w.message || JSON.stringify(w));
     log.warn(`  ! ${label}: ${msg}`);
   }
+}
+
+// ADA Title II / WCAG contrast gate (audit chain, issue #5). Runs once per
+// invocation as a project-level invariant: the student/instructor palette must
+// meet the target before any artifact is generated. Returns true if it passes.
+function runA11yGate(log, { level }) {
+  const report = auditColorPairs(projectColorPairs(), { level });
+  if (report.ok) {
+    log.info(`✓ a11y: palette meets WCAG ${level} (${report.passed} pairs)`);
+    return true;
+  }
+  process.stderr.write(`error: ADA/WCAG ${level} contrast gate failed:\n`);
+  process.stderr.write(formatReport(report, { level }) + '\n');
+  return false;
 }
 
 async function runArtifact({ artifact, parsed, slug, outDir, log, opts }) {
@@ -279,6 +301,17 @@ async function runMain(args) {
   }
   if (validation && validation.warnings && validation.warnings.length > 0) {
     reportWarnings('validate', validation.warnings, log);
+  }
+
+  // ADA/WCAG contrast gate — palette is a project-level invariant; fail fast
+  // before generating any student-facing artifact (override with --skip-a11y).
+  if (!args.flags.skipA11y) {
+    const level = (args.flags['a11y-level'] || 'AA').toUpperCase();
+    if (level !== 'AA' && level !== 'AAA') {
+      process.stderr.write(`error: --a11y-level must be AA or AAA, got ${args.flags['a11y-level']}\n`);
+      process.exit(2);
+    }
+    if (!runA11yGate(log, { level })) process.exit(1);
   }
 
   const slug = topicSlugFromMain(mainPath);
