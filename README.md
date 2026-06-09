@@ -251,9 +251,20 @@ CLAUDE.md.example           # template you copy into your course repo
 ## Tests
 
 ```bash
-npm test       # vitest — parser, validators, and every generator
-npm run check  # node --check syntax-validation across the live sources
+npm test           # vitest — parser, validators, and every generator
+npm run check      # node --check syntax-validation across the live sources
+npm run verify:a11y  # ADA Title II / WCAG contrast audit of the palettes (--level AA|AAA)
 ```
+
+## Accessibility (ADA Title II / WCAG)
+
+Student-facing materials are built toward WCAG 2.1 AA per the
+[md-monolith design spec](docs/specs/2026-05-07-md-monolith-revamp-design.md#accessibility--ada-title-ii-compliance-non-functional-requirement).
+The first stage of the compliance [audit chain](https://github.com/agiacalone/lecture-materials-assistant/issues/5)
+is live: a **palette contrast verifier** (`lib/a11y/`) checks every student/instructor
+color pair against the WCAG target. `generate.js` **gates** on it before emitting any
+artifact — run `npm run verify:a11y` standalone, or pass `--skip-a11y` / `--a11y-level AAA`
+to `generate.js`. The student palette currently passes AA.
 
 ---
 

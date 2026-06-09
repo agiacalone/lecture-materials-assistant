@@ -97,6 +97,7 @@ lecture-materials-assistant/
 ├── exam-reading-list-cli.js       # sub-tool CLI: multi-topic per-exam reading list (driven by lectern reg-exam-readinglist)
 ├── generators/                    # one file per artifact family (lecture-notes, cornell-handout, slides, quiz, study-questions, question-bank, reading-list, exam-reading-list, readme, audit)
 ├── lib/                           # shared LaTeX preamble + Cornell palette helpers
+│   └── a11y/                       # ADA Title II / WCAG audit chain (issue #5): contrast verifier; `generate.js` gates on it
 ├── references/
 │   └── style-guide.md             # Complete style specs — MUST read before generating
 ├── archive/

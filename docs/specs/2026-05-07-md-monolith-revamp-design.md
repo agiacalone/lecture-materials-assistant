@@ -473,6 +473,19 @@ After Phase 3 completes for file_systems_abstraction, manual side-by-side review
 
 CSULB's ADA Title II digital-accessibility deadline extends to **2027-04-26** (DOJ Interim Final Rule, May 2026). Standards have not changed — same WCAG 2.1 AA equivalent, same scope (every digital deliverable distributed to students). The revamp is a natural forcing function: every artifact is re-emitted from `_lecture_main.md`, so compliance fixes propagate across the full set without per-PDF retroactive remediation.
 
+### Implementation status (updated 2026-06-08)
+
+Compliance is being built as a staged **audit chain** ([issue #5](https://github.com/agiacalone/lecture-materials-assistant/issues/5)), not asserted wholesale. Current state:
+
+| Stage | Status |
+|---|---|
+| **Palette contrast** (WCAG 2.1 luminance/ratio) | ✅ **Implemented + verified.** The student + instructor palettes are audited against the WCAG target by `lib/a11y/` (28 tests). The student-facing palette **passes AA** (20/20 pairs). Run `npm run verify:a11y` (`--level AA\|AAA`); `generate.js` **gates** on it before emitting any artifact (override `--skip-a11y`). Role-accurate sizing: bold headings + box borders use the 3:1 threshold, body/muted text 4.5:1. |
+| **Alt-text on visuals** | ◐ Partial — the parser already hard-errors on a `#diagram` / `[layout:: diagram]` missing `[alt:: …]` (see below). A standalone lint pass is still pending. |
+| **Color-and-glyph pairing** | ◐ Enforced in generators (every color cue paired with a glyph/label); a validator sweep is pending. |
+| **Tagged PDF / reading order / table headers** | ☐ Pending — needs `tagpdf`/`pdfmanagement` emission + a [veraPDF](https://verapdf.org/) PDF/UA check stage. |
+
+The "fully compliant" claim is therefore accurate **for the contrast dimension today**, and the remaining stages are tracked toward the 2027-04-26 deadline.
+
 ### Tag taxonomy additions
 
 Two new inline fields on relevant items:
